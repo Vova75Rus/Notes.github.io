@@ -1,20 +1,33 @@
+# Исправленная версия для iPhone 13/14/15
+
+Основные исправления:
+1. **100vh проблема** — на iOS Safari высота включает адресную строку
+2. **Safe Area Insets** — учёт "чёлки" и закруглений
+3. **Touch events** — улучшенная обработка касаний
+4. **Backdrop-filter** — webkit префиксы
+5. **WebGL fallback** — корректный запасной вариант
+6. **Убраны "text"** — ошибки в HTML
+
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Для Арины 💖 С 8 Марта</title>
     <meta name="description" content="Персональная открытка к 8 Марта для самой прекрасной Арины">
     <meta name="theme-color" content="#FF4D85">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta property="og:title" content="Для тебя, Арина 🌸">
     <meta property="og:description" content="Открой, чтобы увидеть кое-что особенное 💝">
 
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=Montserrat:wght@200;300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&display=swap" rel="stylesheet">
 
+    <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
@@ -45,6 +58,15 @@
             --radius: 24px;
             --radius-lg: 32px;
             --radius-pill: 50px;
+            
+            /* iOS Safe Area */
+            --sat: env(safe-area-inset-top, 0px);
+            --sar: env(safe-area-inset-right, 0px);
+            --sab: env(safe-area-inset-bottom, 0px);
+            --sal: env(safe-area-inset-left, 0px);
+            
+            /* Real viewport height for iOS */
+            --vh: 1vh;
         }
 
         /* =============================================
@@ -54,12 +76,13 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
 
         html {
             overflow-x: hidden;
-            /* НЕ используем scroll-behavior: smooth — конфликт с iOS */
+            scroll-behavior: auto;
+            /* Prevent iOS bounce */
+            overscroll-behavior: none;
         }
 
         body {
@@ -69,39 +92,43 @@
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            /* cursor: none убран — ломает тапы на iPhone */
+            /* iOS specific */
+            -webkit-text-size-adjust: 100%;
+            -webkit-tap-highlight-color: transparent;
+            /* Safe area padding */
+            padding: var(--sat) var(--sar) var(--sab) var(--sal);
+        }
+
+        /* Hide cursor only on non-touch devices */
+        @media (hover: hover) and (pointer: fine) {
+            body { cursor: none; }
         }
 
         a { text-decoration: none; color: inherit; }
-
-        button {
-            border: none;
-            outline: none;
+        button { 
+            border: none; 
+            outline: none; 
             font-family: inherit;
-            cursor: pointer; /* обязательно pointer для iOS */
-            background: none;
             -webkit-appearance: none;
             appearance: none;
+            background: transparent;
         }
-
-        ::selection {
-            background: rgba(255, 77, 133, 0.4);
-            color: white;
+        
+        /* Touch devices - normal cursor */
+        @media (hover: none), (pointer: coarse) {
+            button { cursor: pointer; }
         }
+        
+        ::selection { background: rgba(255, 77, 133, 0.4); color: white; }
 
         /* =============================================
-           CUSTOM CURSOR — только десктоп
+           CUSTOM CURSOR - Desktop only
            ============================================= */
-        .cursor-dot,
-        .cursor-ring,
-        .cursor-glow {
-            display: none; /* скрыты по умолчанию */
+        .cursor-dot, .cursor-ring, .cursor-glow {
+            display: none;
         }
-
+        
         @media (hover: hover) and (pointer: fine) {
-            body { cursor: none; }
-            button { cursor: none; }
-
             .cursor-dot {
                 display: block;
                 position: fixed;
@@ -113,7 +140,7 @@
                 z-index: 100000;
                 mix-blend-mode: difference;
                 transform: translate(-50%, -50%);
-                transition: width 0.3s, height 0.3s;
+                transition: width 0.3s, height 0.3s, background 0.3s;
             }
 
             .cursor-ring {
@@ -126,11 +153,10 @@
                 pointer-events: none;
                 z-index: 99999;
                 transform: translate(-50%, -50%);
-                transition:
-                    width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                    height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                    border-color 0.3s,
-                    background 0.3s;
+                transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                            height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                            border-color 0.3s,
+                            background 0.3s;
             }
 
             .cursor-glow {
@@ -147,7 +173,7 @@
         }
 
         /* =============================================
-           BACKGROUND CANVAS
+           WEBGL CANVAS (FLUID BACKGROUND)
            ============================================= */
         #fluid-canvas {
             position: fixed;
@@ -156,22 +182,6 @@
             width: 100%;
             height: 100%;
             z-index: 0;
-        }
-
-        /* Fallback если WebGL не поддерживается */
-        .bg-fallback {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 0;
-            background: radial-gradient(ellipse at 20% 20%, #3a0a2a 0%, #1a0a12 40%, #0d0520 100%);
-            animation: bgShift 20s ease-in-out infinite alternate;
-        }
-
-        @keyframes bgShift {
-            0%   { background: radial-gradient(ellipse at 20% 20%, #3a0a2a 0%, #1a0a12 50%, #0d0520 100%); }
-            50%  { background: radial-gradient(ellipse at 70% 60%, #2a0a3a 0%, #1a0a15 50%, #0d0509 100%); }
-            100% { background: radial-gradient(ellipse at 40% 80%, #3a0515 0%, #150a1a 50%, #050510 100%); }
         }
 
         /* =============================================
@@ -191,60 +201,63 @@
             border-radius: 50%;
             filter: blur(80px);
             opacity: 0.4;
+            /* Optimize for iOS */
             will-change: transform;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
         }
 
         .orb-1 {
-            width: 400px; height: 400px;
+            width: 300px; height: 300px;
             background: radial-gradient(circle, rgba(255, 77, 133, 0.5) 0%, transparent 70%);
             top: -10%; left: -10%;
             animation: orbDrift1 25s ease-in-out infinite;
         }
 
         .orb-2 {
-            width: 350px; height: 350px;
+            width: 250px; height: 250px;
             background: radial-gradient(circle, rgba(224, 195, 252, 0.4) 0%, transparent 70%);
             top: 50%; right: -10%;
             animation: orbDrift2 30s ease-in-out infinite;
         }
 
         .orb-3 {
-            width: 300px; height: 300px;
+            width: 200px; height: 200px;
             background: radial-gradient(circle, rgba(250, 208, 196, 0.35) 0%, transparent 70%);
             bottom: -5%; left: 30%;
             animation: orbDrift3 20s ease-in-out infinite;
         }
 
         .orb-4 {
-            width: 250px; height: 250px;
+            width: 180px; height: 180px;
             background: radial-gradient(circle, rgba(255, 107, 157, 0.3) 0%, transparent 70%);
             top: 30%; left: 50%;
             animation: orbDrift4 35s ease-in-out infinite;
         }
 
         @keyframes orbDrift1 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            25%       { transform: translate(150px, 100px) scale(1.2); }
-            50%       { transform: translate(80px, 250px) scale(0.9); }
-            75%       { transform: translate(-50px, 150px) scale(1.1); }
+            0%, 100% { transform: translate(0, 0) scale(1) translateZ(0); }
+            25% { transform: translate(100px, 70px) scale(1.2) translateZ(0); }
+            50% { transform: translate(50px, 150px) scale(0.9) translateZ(0); }
+            75% { transform: translate(-30px, 100px) scale(1.1) translateZ(0); }
         }
 
         @keyframes orbDrift2 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33%       { transform: translate(-120px, -80px) scale(1.15); }
-            66%       { transform: translate(-60px, 120px) scale(0.85); }
+            0%, 100% { transform: translate(0, 0) scale(1) translateZ(0); }
+            33% { transform: translate(-80px, -50px) scale(1.15) translateZ(0); }
+            66% { transform: translate(-40px, 80px) scale(0.85) translateZ(0); }
         }
 
         @keyframes orbDrift3 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50%       { transform: translate(100px, -100px) scale(1.3); }
+            0%, 100% { transform: translate(0, 0) scale(1) translateZ(0); }
+            50% { transform: translate(70px, -70px) scale(1.3) translateZ(0); }
         }
 
         @keyframes orbDrift4 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            25%       { transform: translate(-80px, 60px) scale(1.1); }
-            50%       { transform: translate(60px, -40px) scale(0.9); }
-            75%       { transform: translate(30px, 80px) scale(1.15); }
+            0%, 100% { transform: translate(0, 0) scale(1) translateZ(0); }
+            25% { transform: translate(-50px, 40px) scale(1.1) translateZ(0); }
+            50% { transform: translate(40px, -30px) scale(0.9) translateZ(0); }
+            75% { transform: translate(20px, 50px) scale(1.15) translateZ(0); }
         }
 
         /* =============================================
@@ -254,6 +267,9 @@
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
+            /* iOS fix for 100vh */
+            height: calc(var(--vh, 1vh) * 100);
+            min-height: -webkit-fill-available;
             background: radial-gradient(ellipse at center, #2a0a1a 0%, #0d0509 100%);
             z-index: 50000;
             display: flex;
@@ -263,17 +279,25 @@
             overflow: hidden;
         }
 
-        .preloader-heart-container {
-            position: relative;
-            width: 120px;
-            height: 120px;
+        .preloader.done {
+            pointer-events: none;
         }
 
-        .preloader-heart svg,
-        .preloader-heart-fill svg {
+        .preloader-heart-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+        }
+
+        .preloader-heart {
             width: 100%;
             height: 100%;
-            filter: drop-shadow(0 0 40px rgba(255, 77, 133, 0.6));
+        }
+
+        .preloader-heart svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 30px rgba(255, 77, 133, 0.6));
         }
 
         .preloader-heart path {
@@ -282,6 +306,7 @@
             stroke-width: 2;
             stroke-dasharray: 300;
             stroke-dashoffset: 300;
+            filter: drop-shadow(0 0 8px rgba(255, 77, 133, 0.5));
         }
 
         .preloader-heart-fill {
@@ -291,15 +316,19 @@
             opacity: 0;
         }
 
+        .preloader-heart-fill svg {
+            width: 100%; height: 100%;
+        }
+
         .preloader-heart-fill path {
-            fill: url(#preloaderHeartFillGrad2);
+            fill: url(#preloaderHeartFillGrad);
         }
 
         .preloader-heart-glow {
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            width: 200px; height: 200px;
+            width: 150px; height: 150px;
             border-radius: 50%;
             background: radial-gradient(circle, rgba(255, 77, 133, 0.3) 0%, transparent 70%);
             opacity: 0;
@@ -307,12 +336,12 @@
 
         .preloader-text {
             font-family: var(--font-body);
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 300;
-            letter-spacing: 4px;
+            letter-spacing: 3px;
             text-transform: uppercase;
             color: var(--text-muted);
-            margin-top: 40px;
+            margin-top: 30px;
             opacity: 0;
         }
 
@@ -330,7 +359,7 @@
         }
 
         /* =============================================
-           GLASS CARD
+           GLASS CARD BASE
            ============================================= */
         .glass {
             background: var(--glass-bg);
@@ -342,6 +371,9 @@
             position: relative;
             overflow: hidden;
             transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            /* iOS optimization */
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
         }
 
         .glass::before {
@@ -354,25 +386,24 @@
             z-index: 1;
         }
 
-        /* Hover эффекты только на десктопе */
-        @media (hover: hover) and (pointer: fine) {
-            .glass::after {
-                content: '';
-                position: absolute;
-                top: -50%; left: -50%;
-                width: 200%; height: 200%;
-                background: radial-gradient(
-                    ellipse at var(--mouse-x, 50%) var(--mouse-y, 50%),
-                    rgba(255, 255, 255, 0.08) 0%,
-                    transparent 50%
-                );
-                pointer-events: none;
-                z-index: 2;
-                opacity: 0;
-                transition: opacity 0.5s;
-            }
+        .glass::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(ellipse at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
 
-            .glass:hover::after { opacity: 1; }
+        /* Only apply hover effects on devices with hover capability */
+        @media (hover: hover) {
+            .glass:hover::after {
+                opacity: 1;
+            }
 
             .glass:hover {
                 background: var(--glass-bg-hover);
@@ -393,7 +424,7 @@
         }
 
         /* =============================================
-           LAYOUT
+           CONTENT WRAPPER
            ============================================= */
         .content {
             position: relative;
@@ -402,13 +433,15 @@
 
         .section {
             min-height: 100vh;
-            min-height: 100dvh; /* iOS safe */
+            /* iOS Safari fix */
+            min-height: calc(var(--vh, 1vh) * 100);
+            min-height: -webkit-fill-available;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 80px 24px;
-            padding-top: max(80px, env(safe-area-inset-top) + 40px);
-            padding-bottom: max(80px, env(safe-area-inset-bottom) + 40px);
+            padding-top: calc(80px + var(--sat));
+            padding-bottom: calc(80px + var(--sab));
             position: relative;
         }
 
@@ -419,21 +452,27 @@
         }
 
         /* =============================================
-           HERO
+           SCREEN 1: HERO
            ============================================= */
         .hero {
             flex-direction: column;
             text-align: center;
+            gap: 0;
         }
 
         .hero-label {
             font-family: var(--font-body);
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 400;
-            letter-spacing: 6px;
+            letter-spacing: 4px;
             text-transform: uppercase;
             color: var(--text-muted);
-            margin-bottom: 30px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .hero-label span {
+            display: inline-block;
         }
 
         .hero-title {
@@ -441,6 +480,7 @@
             font-weight: 400;
             line-height: 1.2;
             margin-bottom: 10px;
+            overflow: hidden;
         }
 
         .hero-title .line {
@@ -454,39 +494,45 @@
         }
 
         .hero-title .line-1 span {
-            font-size: clamp(28px, 6vw, 64px);
+            font-size: clamp(28px, 7vw, 72px);
             font-weight: 300;
             font-style: italic;
             color: var(--text-pearl);
         }
 
         .hero-title .line-2 span {
-            font-size: clamp(48px, 10vw, 100px);
+            font-size: clamp(44px, 11vw, 110px);
             font-weight: 900;
             background: linear-gradient(135deg, #FFFFFF 0%, #FFB6D5 40%, #E0C3FC 70%, #FFFFFF 100%);
             background-size: 300% 100%;
             -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
             background-clip: text;
+            -webkit-text-fill-color: transparent;
             animation: shimmer 4s ease infinite;
+            filter: drop-shadow(0 0 20px rgba(255, 77, 133, 0.3));
         }
 
         @keyframes shimmer {
-            0%   { background-position: 300% center; }
+            0% { background-position: 300% center; }
             100% { background-position: -300% center; }
         }
 
         .hero-date {
             font-family: var(--font-body);
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 300;
-            letter-spacing: 4px;
+            letter-spacing: 3px;
             color: var(--text-muted);
-            margin-top: 20px;
+            margin-top: 16px;
             margin-bottom: 50px;
+            overflow: hidden;
         }
 
-        /* Кнопка */
+        .hero-date span {
+            display: inline-block;
+        }
+
+        /* Button */
         .magnetic-btn-wrapper {
             display: inline-block;
             position: relative;
@@ -496,7 +542,7 @@
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            padding: 18px 44px;
+            padding: 16px 36px;
             background: rgba(255, 255, 255, 0.07);
             -webkit-backdrop-filter: blur(20px);
             backdrop-filter: blur(20px);
@@ -504,24 +550,32 @@
             border-radius: var(--radius-pill);
             color: var(--text-white);
             font-family: var(--font-body);
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 400;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             text-transform: uppercase;
             transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             position: relative;
             overflow: hidden;
-            /* Важно для iOS: кнопка должна быть кликабельна */
+            /* iOS tap fix */
+            -webkit-touch-callout: none;
             touch-action: manipulation;
         }
 
-        .magnetic-btn:active {
-            background: rgba(255, 255, 255, 0.14);
-            border-color: rgba(255, 255, 255, 0.4);
-            transform: scale(0.97);
+        .magnetic-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.6s;
         }
 
         @media (hover: hover) {
+            .magnetic-btn:hover::before {
+                left: 100%;
+            }
+
             .magnetic-btn:hover {
                 background: rgba(255, 255, 255, 0.14);
                 border-color: rgba(255, 255, 255, 0.4);
@@ -529,25 +583,33 @@
             }
         }
 
+        /* Active state for touch */
+        .magnetic-btn:active {
+            background: rgba(255, 255, 255, 0.14);
+            transform: scale(0.98);
+        }
+
         .magnetic-btn .btn-arrow {
             display: inline-block;
             transition: transform 0.3s;
         }
 
+        /* Scroll Indicator */
         .scroll-indicator {
             position: absolute;
-            bottom: 30px;
+            bottom: calc(30px + var(--sab));
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             flex-direction: column;
             align-items: center;
+            gap: 8px;
             opacity: 0;
         }
 
         .scroll-line {
             width: 1px;
-            height: 50px;
+            height: 40px;
             background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
             position: relative;
             overflow: hidden;
@@ -564,33 +626,35 @@
         }
 
         @keyframes scrollLineMove {
-            0%   { top: -50%; }
+            0% { top: -50%; }
             100% { top: 150%; }
         }
 
         /* =============================================
-           COMPLIMENTS
+           SCREEN 2: COMPLIMENTS CAROUSEL
            ============================================= */
-        .compliments { overflow: hidden; }
+        .compliments {
+            overflow: hidden;
+        }
 
         .compliments-header {
             text-align: center;
-            margin-bottom: 50px;
+            margin-bottom: 40px;
         }
 
         .compliments-label {
             font-family: var(--font-body);
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 400;
-            letter-spacing: 5px;
+            letter-spacing: 4px;
             text-transform: uppercase;
             color: var(--text-muted);
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
         .compliments-title {
             font-family: var(--font-display);
-            font-size: clamp(28px, 5vw, 52px);
+            font-size: clamp(28px, 6vw, 56px);
             font-weight: 700;
             font-style: italic;
             color: var(--text-white);
@@ -605,10 +669,10 @@
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
             -ms-overflow-style: none;
-            padding-left: 24px;
-            padding-right: 24px;
-            /* Убираем overscroll чтобы не мешать скроллу страницы */
-            overscroll-behavior-x: contain;
+            padding-left: max(20px, calc((100vw - 1000px) / 2));
+            padding-right: 20px;
+            /* iOS scroll fix */
+            -webkit-scroll-snap-type: x mandatory;
         }
 
         .carousel::-webkit-scrollbar { display: none; }
@@ -618,6 +682,7 @@
             max-width: 320px;
             padding: 36px 28px;
             scroll-snap-align: center;
+            -webkit-scroll-snap-align: center;
             flex-shrink: 0;
             text-align: center;
             border-radius: var(--radius-lg);
@@ -625,15 +690,15 @@
 
         .carousel-card .card-number {
             font-family: var(--font-display);
-            font-size: 56px;
+            font-size: 52px;
             font-weight: 900;
             font-style: italic;
             background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%);
             -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
             background-clip: text;
+            -webkit-text-fill-color: transparent;
             line-height: 1;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             position: relative;
             z-index: 4;
         }
@@ -652,7 +717,7 @@
         .carousel-card .card-emoji {
             font-size: 36px;
             display: block;
-            margin-top: 18px;
+            margin-top: 16px;
             position: relative;
             z-index: 4;
         }
@@ -670,21 +735,21 @@
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.2);
             transition: all 0.3s;
-            cursor: pointer;
-            /* Увеличиваем tap-область для iPhone */
-            padding: 6px;
-            margin: -6px;
-            touch-action: manipulation;
+            /* Touch target size */
+            padding: 10px;
+            margin: -10px;
+            background-clip: content-box;
         }
 
         .carousel-dot.active {
             background: var(--text-white);
             width: 24px;
             border-radius: 4px;
+            background-clip: content-box;
         }
 
         /* =============================================
-           MESSAGE SECTION
+           SCREEN 3: MESSAGE (FOG EFFECT)
            ============================================= */
         .message-section {
             flex-direction: column;
@@ -693,26 +758,27 @@
 
         .message-label {
             font-family: var(--font-body);
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 400;
-            letter-spacing: 5px;
+            letter-spacing: 4px;
             text-transform: uppercase;
             color: var(--text-muted);
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
 
         .message-card {
-            max-width: 650px;
+            max-width: 600px;
             width: 100%;
             margin: 0 auto;
-            padding: 50px 36px;
+            padding: 50px 28px;
             border-radius: var(--radius-lg);
             position: relative;
+            min-height: 380px;
         }
 
         .message-envelope-icon {
-            font-size: 44px;
-            margin-bottom: 28px;
+            font-size: 40px;
+            margin-bottom: 24px;
             display: block;
             position: relative;
             z-index: 5;
@@ -720,36 +786,40 @@
 
         .message-text {
             font-family: var(--font-accent);
-            font-size: clamp(17px, 2.5vw, 22px);
+            font-size: clamp(17px, 3vw, 22px);
             font-weight: 400;
-            line-height: 1.9;
+            line-height: 1.8;
             color: var(--text-pearl);
             position: relative;
             z-index: 5;
         }
 
-        .message-text p { margin-bottom: 16px; }
+        .message-text p {
+            margin-bottom: 14px;
+        }
 
         .message-signature {
             font-family: var(--font-display);
             font-size: 20px;
             font-style: italic;
             color: var(--pink-pastel);
-            margin-top: 28px;
+            margin-top: 24px;
             position: relative;
             z-index: 5;
         }
 
-        /* ——— Fog Effect (переработан для iOS) ——— */
+        /* Fog Overlay */
         .fog-overlay {
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
             z-index: 6;
             border-radius: var(--radius-lg);
-            background: rgba(20, 6, 14, 0.92);
+            background: radial-gradient(ellipse at center,
+                rgba(26, 10, 18, 0.85) 0%,
+                rgba(26, 10, 18, 0.95) 100%);
             pointer-events: none;
-            transition: opacity 1.5s ease;
+            transition: opacity 0.3s;
         }
 
         .fog-hint {
@@ -758,66 +828,43 @@
             transform: translate(-50%, -50%);
             z-index: 10;
             font-family: var(--font-body);
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 300;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             color: var(--text-muted);
             text-align: center;
             pointer-events: none;
             transition: opacity 0.5s;
-            white-space: nowrap;
         }
 
-        .fog-hint .fog-icon {
+        .fog-hint span {
             display: block;
-            font-size: 28px;
+            font-size: 24px;
             margin-bottom: 10px;
         }
 
-        /* Touch indicator для мобильных */
-        .fog-touch-indicator {
-            position: absolute;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 9;
-            background: radial-gradient(
-                circle,
-                rgba(255, 77, 133, 0.4) 0%,
-                rgba(255, 77, 133, 0.1) 50%,
-                transparent 70%
-            );
-            transform: translate(-50%, -50%) scale(0);
-            width: 100px;
-            height: 100px;
-            transition: transform 0.15s ease-out;
-        }
-
-        .fog-touch-indicator.active {
-            transform: translate(-50%, -50%) scale(1);
-        }
-
         /* =============================================
-           FINALE
+           SCREEN 4: FINALE
            ============================================= */
         .finale {
             flex-direction: column;
             text-align: center;
-            gap: 0;
+            gap: 10px;
         }
 
         .finale-emoji {
-            font-size: 48px;
-            margin-bottom: 20px;
+            font-size: 40px;
+            margin-bottom: 16px;
         }
 
         .finale-text {
             font-family: var(--font-display);
-            font-size: clamp(26px, 5vw, 48px);
+            font-size: clamp(26px, 6vw, 48px);
             font-weight: 400;
             font-style: italic;
             line-height: 1.4;
             color: var(--text-pearl);
-            max-width: 580px;
+            max-width: 550px;
         }
 
         .finale-text em {
@@ -828,31 +875,30 @@
 
         .finale-subtext {
             font-family: var(--font-body);
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 300;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             color: var(--text-muted);
-            margin-top: 20px;
+            margin-top: 16px;
         }
 
         .finale-heart-btn {
-            margin-top: 50px;
-            width: 90px;
-            height: 90px;
+            margin-top: 40px;
+            width: 80px;
+            height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: rgba(255, 77, 133, 0.15);
             border: 1px solid rgba(255, 77, 133, 0.3);
             border-radius: 50%;
-            font-size: 40px;
-            cursor: pointer;
-            transition: all 0.4s ease;
+            font-size: 36px;
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             animation: heartGlow 3s ease-in-out infinite;
             position: relative;
+            /* Touch fix */
+            -webkit-touch-callout: none;
             touch-action: manipulation;
-            /* Убираем задержку клика на iOS */
-            -webkit-tap-highlight-color: transparent;
         }
 
         .finale-heart-btn::before {
@@ -864,46 +910,56 @@
             animation: heartRing 3s ease-in-out infinite;
         }
 
-        .finale-heart-btn:active {
-            transform: scale(0.92);
-            background: rgba(255, 77, 133, 0.3);
-        }
-
         @keyframes heartGlow {
-            0%, 100% { box-shadow: 0 0 30px rgba(255, 77, 133, 0.2); }
-            50%       { box-shadow: 0 0 60px rgba(255, 77, 133, 0.4); }
+            0%, 100% { box-shadow: 0 0 25px rgba(255, 77, 133, 0.2); }
+            50% { box-shadow: 0 0 50px rgba(255, 77, 133, 0.4); }
         }
 
         @keyframes heartRing {
             0%, 100% { transform: scale(1); opacity: 0.5; }
-            50%       { transform: scale(1.15); opacity: 0; }
+            50% { transform: scale(1.15); opacity: 0; }
+        }
+
+        .finale-heart-btn:active {
+            background: rgba(255, 77, 133, 0.3);
+            transform: scale(0.95);
+        }
+
+        @media (hover: hover) {
+            .finale-heart-btn:hover {
+                background: rgba(255, 77, 133, 0.3);
+                border-color: rgba(255, 77, 133, 0.5);
+                transform: scale(1.1);
+            }
         }
 
         .finale-heart-hint {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 300;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             color: var(--text-muted);
             margin-top: 14px;
             text-transform: uppercase;
         }
 
         .finale-reveal {
-            margin-top: 40px;
+            margin-top: 36px;
             font-family: var(--font-display);
-            font-size: clamp(22px, 4.5vw, 38px);
+            font-size: clamp(22px, 5vw, 38px);
             font-weight: 700;
             font-style: italic;
             color: var(--text-white);
             opacity: 0;
             transform: scale(0.8) translateY(20px);
+            filter: blur(10px);
             transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            text-shadow: 0 0 40px rgba(255, 77, 133, 0.5);
+            text-shadow: 0 0 30px rgba(255, 77, 133, 0.5);
         }
 
         .finale-reveal.show {
             opacity: 1;
             transform: scale(1) translateY(0);
+            filter: blur(0);
         }
 
         /* =============================================
@@ -918,29 +974,33 @@
         }
 
         /* =============================================
-           RESPONSIVE
+           RESPONSIVE - iPhone specific
            ============================================= */
-        @media (max-width: 768px) {
-            .section { padding: 50px 16px; }
-            .message-card { padding: 36px 20px; }
+        @media (max-width: 430px) {
+            .section { 
+                padding: 60px 16px; 
+                padding-top: calc(60px + var(--sat));
+                padding-bottom: calc(60px + var(--sab));
+            }
+            .message-card { padding: 36px 20px; min-height: 350px; }
             .carousel-card { min-width: 260px; padding: 28px 20px; }
             .carousel-card .card-text { font-size: 18px; }
             .carousel-card .card-number { font-size: 44px; }
-            .finale-heart-btn { width: 76px; height: 76px; font-size: 34px; }
+            .finale-heart-btn { width: 70px; height: 70px; font-size: 30px; }
+
+            .orb-1 { width: 200px; height: 200px; }
+            .orb-2 { width: 150px; height: 150px; }
             .orb-3, .orb-4 { display: none; }
-            .orb-1 { width: 220px; height: 220px; filter: blur(50px); }
-            .orb-2 { width: 180px; height: 180px; filter: blur(50px); }
+            
+            .hero-date { margin-bottom: 40px; }
+            .magnetic-btn { padding: 14px 28px; font-size: 12px; }
         }
 
-        @media (max-width: 390px) {
-            /* iPhone 14/15 стандарт */
-            .hero-label { letter-spacing: 3px; }
-            .magnetic-btn { padding: 16px 32px; font-size: 12px; letter-spacing: 2px; }
+        /* iPhone SE and small screens */
+        @media (max-width: 375px) {
             .carousel-card { min-width: 240px; }
-        }
-
-        @media (max-width: 320px) {
-            .carousel-card { min-width: 210px; padding: 24px 16px; }
+            .hero-title .line-1 span { font-size: 24px; }
+            .hero-title .line-2 span { font-size: 40px; }
         }
 
         /* =============================================
@@ -958,19 +1018,18 @@
 </head>
 <body>
 
-<!-- CUSTOM CURSOR (только десктоп) -->
-<div class="cursor-dot"  id="cursorDot"></div>
+<!-- CUSTOM CURSOR (Desktop only) -->
+<div class="cursor-dot" id="cursorDot"></div>
 <div class="cursor-ring" id="cursorRing"></div>
 <div class="cursor-glow" id="cursorGlow"></div>
 
-<!-- CONFETTI -->
+<!-- CONFETTI CANVAS -->
 <canvas class="confetti-canvas" id="confettiCanvas"></canvas>
 
-<!-- BACKGROUND -->
+<!-- WEBGL FLUID BACKGROUND -->
 <canvas id="fluid-canvas"></canvas>
-<div class="bg-fallback" id="bgFallback" style="display:none;"></div>
 
-<!-- ORBS -->
+<!-- LIGHT ORBS -->
 <div class="orbs-container">
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
@@ -983,11 +1042,15 @@
     <div class="preloader-heart-glow" id="preloaderGlow"></div>
     <div class="preloader-heart-container">
         <div class="preloader-heart">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 100 100">
                 <defs>
                     <linearGradient id="preloaderHeartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%"   stop-color="#FF4D85"/>
-                        <stop offset="50%"  stop-color="#FFB6D5"/>
+                        <stop offset="0%" stop-color="#FF4D85"/>
+                        <stop offset="50%" stop-color="#FFB6D5"/>
+                        <stop offset="100%" stop-color="#E0C3FC"/>
+                    </linearGradient>
+                    <linearGradient id="preloaderHeartFillGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#FF4D85"/>
                         <stop offset="100%" stop-color="#E0C3FC"/>
                     </linearGradient>
                 </defs>
@@ -995,14 +1058,15 @@
             </svg>
         </div>
         <div class="preloader-heart-fill">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 100 100">
                 <defs>
                     <linearGradient id="preloaderHeartFillGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%"   stop-color="#FF4D85"/>
+                        <stop offset="0%" stop-color="#FF4D85"/>
                         <stop offset="100%" stop-color="#E0C3FC"/>
                     </linearGradient>
                 </defs>
-                <path d="M50 88 C25 65, 2 45, 2 28 C2 14, 13 3, 27 3 C35 3, 43 8, 50 18 C57 8, 65 3, 73 3 C87 3, 98 14, 98 28 C98 45, 75 65, 50 88Z"/>
+                <path d="M50 88 C25 65, 2 45, 2 28 C2 14, 13 3, 27 3 C35 3, 43 8, 50 18 C57 8, 65 3, 73 3 C87 3, 98 14, 98 28 C98 45, 75 65, 50 88Z"
+                      fill="url(#preloaderHeartFillGrad2)"/>
             </svg>
         </div>
     </div>
@@ -1013,19 +1077,21 @@
 <!-- ========= MAIN CONTENT ========= -->
 <div class="content" id="content">
 
-    <!-- HERO -->
+    <!-- SCREEN 1: HERO -->
     <section class="section hero" id="heroSection">
-        <p class="hero-label">С днём весны и красоты</p>
+        <div class="hero-label">
+            <span>С днём весны и красоты</span>
+        </div>
 
         <h1 class="hero-title">
             <span class="line line-1"><span>Для самой прекрасной</span></span>
             <span class="line line-2"><span>Арины</span></span>
         </h1>
 
-        <p class="hero-date">8 марта 2025</p>
+        <p class="hero-date"><span>8 марта 2025</span></p>
 
         <div class="magnetic-btn-wrapper" id="magneticWrapper">
-            <button class="magnetic-btn" id="magneticBtn">
+            <button class="magnetic-btn" id="magneticBtn" onclick="scrollToSection('#complimentsSection')">
                 Коснись меня
                 <span class="btn-arrow">↓</span>
             </button>
@@ -1036,7 +1102,7 @@
         </div>
     </section>
 
-    <!-- COMPLIMENTS -->
+    <!-- SCREEN 2: COMPLIMENTS -->
     <section class="section compliments" id="complimentsSection">
         <div class="section-inner">
             <div class="compliments-header">
@@ -1087,7 +1153,7 @@
         </div>
     </section>
 
-    <!-- MESSAGE -->
+    <!-- SCREEN 3: MESSAGE -->
     <section class="section message-section" id="messageSection">
         <p class="message-label">Главное послание</p>
 
@@ -1099,22 +1165,20 @@
                 <p>Дорогая Арина,</p>
                 <p>В этот весенний день хочу сказать тебе то, что порой забываешь услышать в суете дней: ты — невероятная. Не просто красивая, не просто умная, а по-настоящему особенная.</p>
                 <p>Ты наполняешь собой пространство так, что оно начинает дышать. Рядом с тобой расцветает всё — от мыслей до мечтаний.</p>
-                <p>Пусть этот день станет началом самой прекрасной весны в твоей жизни. Ты заслуживаешь каждого луча солнца, каждого тёплого слова и каждого исполненного желания. 🌸</p>
+                <p>Пусть этот день станет началом самой прекрасной весны в твоей жизни. 🌸</p>
             </div>
 
             <p class="message-signature">С бесконечной нежностью ❤️</p>
 
-            <!-- Fog overlay (CSS-based, без canvas mask) -->
             <div class="fog-overlay" id="fogOverlay"></div>
-            <div class="fog-touch-indicator" id="fogTouchIndicator"></div>
             <div class="fog-hint" id="fogHint">
-                <span class="fog-icon">👆</span>
-                Коснись, чтобы прочитать
+                <span>👆</span>
+                Проведи по стеклу,<br>чтобы прочитать
             </div>
         </div>
     </section>
 
-    <!-- FINALE -->
+    <!-- SCREEN 4: FINALE -->
     <section class="section finale" id="finaleSection">
         <p class="finale-emoji">🌙</p>
         <p class="finale-text">
@@ -1123,11 +1187,7 @@
         </p>
         <p class="finale-subtext">Арина, ты — лучшее, что есть</p>
 
-        <button
-            class="finale-heart-btn"
-            id="finaleHeartBtn"
-            aria-label="Нажми чтобы увидеть поздравление"
-        >
+        <button class="finale-heart-btn" id="finaleHeartBtn" onclick="triggerFinale()">
             💖
         </button>
         <p class="finale-heart-hint">нажми</p>
@@ -1137,709 +1197,633 @@
         </p>
     </section>
 
-</div><!-- /content -->
+</div>
 
-
-<!-- ================================================
+<!-- ========================================
      JAVASCRIPT
-     ================================================ -->
+     ======================================== -->
 <script>
-// =============================================
-// HELPERS
-// =============================================
-const isTouchDevice = window.matchMedia('(hover: none)').matches
-                   || ('ontouchstart' in window);
-const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
-// =============================================
-// GSAP REGISTER
-// =============================================
-gsap.registerPlugin(ScrollTrigger);
-
-// ScrollTrigger нормальнее работает без smooth scroll на iOS
-ScrollTrigger.config({ ignoreMobileResize: true });
-
-// =============================================
-// WEBGL FLUID BACKGROUND
-// =============================================
-(function initFluid() {
-    const canvas = document.getElementById('fluid-canvas');
-
-    // iOS Safari иногда даёт контекст, но с ограничениями
-    // Используем более безопасную инициализацию
-    let gl = null;
-    try {
-        gl = canvas.getContext('webgl', { antialias: false, alpha: false })
-             || canvas.getContext('experimental-webgl', { antialias: false, alpha: false });
-    } catch(e) { gl = null; }
-
-    if (!gl) {
-        canvas.style.display = 'none';
-        document.getElementById('bgFallback').style.display = 'block';
-        return;
+    // =============================================
+    // iOS VIEWPORT HEIGHT FIX
+    // =============================================
+    function setVH() {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
     }
-
-    let width, height, mouseX = 0.5, mouseY = 0.5, time = 0;
-    let animFrameId = null;
-
-    function resize() {
-        width  = canvas.width  = window.innerWidth;
-        height = canvas.height = window.innerHeight;
-        gl.viewport(0, 0, width, height);
-    }
-    resize();
-
-    // Дебаунс resize для iOS (адресная строка)
-    let resizeTimer;
-    window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(resize, 100);
+    setVH();
+    window.addEventListener('resize', setVH);
+    window.addEventListener('orientationchange', () => {
+        setTimeout(setVH, 100);
     });
 
-    const vertSrc = `
-        attribute vec2 position;
-        void main() {
-            gl_Position = vec4(position, 0.0, 1.0);
+    // =============================================
+    // GSAP REGISTER
+    // =============================================
+    gsap.registerPlugin(ScrollTrigger);
+
+    // =============================================
+    // DETECT TOUCH DEVICE
+    // =============================================
+    const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+    // =============================================
+    // WEBGL FLUID BACKGROUND
+    // =============================================
+    (function initFluid() {
+        const canvas = document.getElementById('fluid-canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+
+        if (!gl) {
+            canvas.style.background = 'linear-gradient(135deg, #1a0a12 0%, #2a0a1a 30%, #1a0a20 60%, #0d0509 100%)';
+            return;
         }
-    `;
 
-    const fragSrc = `
-        precision mediump float;
-        uniform float u_time;
-        uniform vec2 u_resolution;
-        uniform vec2 u_mouse;
+        let width, height, mouseX = 0.5, mouseY = 0.5, time = 0;
 
-        vec3 palette(float t) {
-            vec3 a = vec3(0.15, 0.04, 0.08);
-            vec3 b = vec3(0.6,  0.15, 0.3);
-            vec3 c = vec3(0.4,  0.2,  0.5);
-            vec3 d = vec3(0.15, 0.1,  0.2);
-            return a + b * cos(6.28318 * (c * t + d));
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            gl.viewport(0, 0, width, height);
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        const vertSrc = `
+            attribute vec2 position;
+            void main() {
+                gl_Position = vec4(position, 0.0, 1.0);
+            }
+        `;
+
+        const fragSrc = `
+            precision mediump float;
+            uniform float u_time;
+            uniform vec2 u_resolution;
+            uniform vec2 u_mouse;
+
+            vec3 palette(float t) {
+                vec3 a = vec3(0.15, 0.04, 0.08);
+                vec3 b = vec3(0.6, 0.15, 0.3);
+                vec3 c = vec3(0.4, 0.2, 0.5);
+                vec3 d = vec3(0.15, 0.1, 0.2);
+                return a + b * cos(6.28318 * (c * t + d));
+            }
+
+            void main() {
+                vec2 uv = gl_FragCoord.xy / u_resolution;
+                vec2 mouse = u_mouse;
+
+                float dist = length(uv - mouse);
+                float wave1 = sin(uv.x * 4.0 + u_time * 0.4 + dist * 3.0) * 0.5 + 0.5;
+                float wave2 = sin(uv.y * 3.0 - u_time * 0.3 + dist * 2.0) * 0.5 + 0.5;
+                float wave3 = sin((uv.x + uv.y) * 2.5 + u_time * 0.2) * 0.5 + 0.5;
+
+                float pattern = wave1 * 0.4 + wave2 * 0.35 + wave3 * 0.25;
+                float mouseGlow = smoothstep(0.4, 0.0, dist) * 0.3;
+
+                vec3 color = palette(pattern + u_time * 0.05);
+                color += mouseGlow * vec3(0.8, 0.2, 0.4);
+
+                float vignette = 1.0 - smoothstep(0.3, 1.2, length(uv - 0.5) * 1.4);
+                color *= vignette * 1.1;
+
+                gl_FragColor = vec4(color, 1.0);
+            }
+        `;
+
+        function createShader(type, src) {
+            const s = gl.createShader(type);
+            gl.shaderSource(s, src);
+            gl.compileShader(s);
+            if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+                gl.deleteShader(s);
+                return null;
+            }
+            return s;
         }
 
-        void main() {
-            vec2 uv    = gl_FragCoord.xy / u_resolution;
-            vec2 mouse = u_mouse;
-            float dist = length(uv - mouse);
+        const vs = createShader(gl.VERTEX_SHADER, vertSrc);
+        const fs = createShader(gl.FRAGMENT_SHADER, fragSrc);
 
-            float wave1 = sin(uv.x * 4.0 + u_time * 0.4 + dist * 3.0) * 0.5 + 0.5;
-            float wave2 = sin(uv.y * 3.0 - u_time * 0.3 + dist * 2.0) * 0.5 + 0.5;
-            float wave3 = sin((uv.x + uv.y) * 2.5 + u_time * 0.2) * 0.5 + 0.5;
-
-            float pattern    = wave1 * 0.4 + wave2 * 0.35 + wave3 * 0.25;
-            float mouseGlow  = smoothstep(0.4, 0.0, dist) * 0.3;
-
-            vec3 color = palette(pattern + u_time * 0.05);
-            color += mouseGlow * vec3(0.8, 0.2, 0.4);
-
-            float vignette = 1.0 - smoothstep(0.3, 1.2, length(uv - 0.5) * 1.4);
-            color *= vignette * 1.1;
-
-            gl_FragColor = vec4(color, 1.0);
+        if (!vs || !fs) {
+            canvas.style.background = 'linear-gradient(135deg, #1a0a12, #2a0a1a)';
+            return;
         }
-    `;
 
-    function createShader(type, src) {
-        const s = gl.createShader(type);
-        gl.shaderSource(s, src);
-        gl.compileShader(s);
-        if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-            console.warn('Shader error:', gl.getShaderInfoLog(s));
-            gl.deleteShader(s);
-            return null;
+        const program = gl.createProgram();
+        gl.attachShader(program, vs);
+        gl.attachShader(program, fs);
+        gl.linkProgram(program);
+        gl.useProgram(program);
+
+        const verts = new Float32Array([-1,-1, 1,-1, -1,1, 1,1]);
+        const buf = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+        gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
+
+        const posLoc = gl.getAttribLocation(program, 'position');
+        gl.enableVertexAttribArray(posLoc);
+        gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+        const uTime = gl.getUniformLocation(program, 'u_time');
+        const uRes = gl.getUniformLocation(program, 'u_resolution');
+        const uMouse = gl.getUniformLocation(program, 'u_mouse');
+
+        if (!isTouchDevice) {
+            document.addEventListener('mousemove', e => {
+                mouseX = e.clientX / width;
+                mouseY = 1.0 - e.clientY / height;
+            });
         }
-        return s;
-    }
 
-    const vs = createShader(gl.VERTEX_SHADER,   vertSrc);
-    const fs = createShader(gl.FRAGMENT_SHADER, fragSrc);
+        document.addEventListener('touchmove', e => {
+            if (e.touches[0]) {
+                mouseX = e.touches[0].clientX / width;
+                mouseY = 1.0 - e.touches[0].clientY / height;
+            }
+        }, { passive: true });
 
-    if (!vs || !fs) {
-        canvas.style.display = 'none';
-        document.getElementById('bgFallback').style.display = 'block';
-        return;
-    }
-
-    const program = gl.createProgram();
-    gl.attachShader(program, vs);
-    gl.attachShader(program, fs);
-    gl.linkProgram(program);
-
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        console.warn('Program link error:', gl.getProgramInfoLog(program));
-        canvas.style.display = 'none';
-        document.getElementById('bgFallback').style.display = 'block';
-        return;
-    }
-
-    gl.useProgram(program);
-
-    const verts = new Float32Array([-1,-1, 1,-1, -1,1, 1,1]);
-    const buf   = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
-
-    const posLoc = gl.getAttribLocation(program, 'position');
-    gl.enableVertexAttribArray(posLoc);
-    gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
-
-    const uTime  = gl.getUniformLocation(program, 'u_time');
-    const uRes   = gl.getUniformLocation(program, 'u_resolution');
-    const uMouse = gl.getUniformLocation(program, 'u_mouse');
-
-    // Mouse / touch для fluid
-    document.addEventListener('mousemove', e => {
-        mouseX = e.clientX / width;
-        mouseY = 1.0 - e.clientY / height;
-    });
-
-    document.addEventListener('touchmove', e => {
-        if (e.touches[0]) {
-            mouseX = e.touches[0].clientX / width;
-            mouseY = 1.0 - e.touches[0].clientY / height;
-        }
-    }, { passive: true });
-
-    // Ограничиваем FPS на мобильных для экономии батареи
-    let lastTime = 0;
-    const targetFPS = isTouchDevice ? 30 : 60;
-    const frameInterval = 1000 / targetFPS;
-
-    function render(now) {
-        animFrameId = requestAnimationFrame(render);
-        const delta = now - lastTime;
-        if (delta < frameInterval) return;
-        lastTime = now - (delta % frameInterval);
-
-        time += 0.016;
-        gl.uniform1f(uTime,  time);
-        gl.uniform2f(uRes,   width, height);
-        gl.uniform2f(uMouse, mouseX, mouseY);
-        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-    }
-    requestAnimationFrame(render);
-
-    // Останавливаем рендер когда вкладка скрыта (экономия батареи)
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-            cancelAnimationFrame(animFrameId);
-        } else {
+        function render() {
+            time += 0.016;
+            gl.uniform1f(uTime, time);
+            gl.uniform2f(uRes, width, height);
+            gl.uniform2f(uMouse, mouseX, mouseY);
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
             requestAnimationFrame(render);
         }
-    });
-})();
+        render();
+    })();
 
-// =============================================
-// CUSTOM CURSOR (только десктоп с мышью)
-// =============================================
-(function initCursor() {
-    if (isTouchDevice) return;
+    // =============================================
+    // CUSTOM CURSOR (Desktop only)
+    // =============================================
+    (function initCursor() {
+        if (isTouchDevice) return;
 
-    const dot  = document.getElementById('cursorDot');
-    const ring = document.getElementById('cursorRing');
-    const glow = document.getElementById('cursorGlow');
+        const dot = document.getElementById('cursorDot');
+        const ring = document.getElementById('cursorRing');
+        const glow = document.getElementById('cursorGlow');
 
-    if (!dot || !ring) return;
+        if (!dot || !ring) return;
 
-    let mx = window.innerWidth / 2, my = window.innerHeight / 2;
-    let cx = mx, cy = my;
+        let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+        let cx = mx, cy = my;
 
-    document.addEventListener('mousemove', e => {
-        mx = e.clientX;
-        my = e.clientY;
-        dot.style.left  = mx + 'px';
-        dot.style.top   = my + 'px';
-        glow.style.left = mx + 'px';
-        glow.style.top  = my + 'px';
-    });
-
-    function animateCursor() {
-        cx += (mx - cx) * 0.15;
-        cy += (my - cy) * 0.15;
-        ring.style.left = cx + 'px';
-        ring.style.top  = cy + 'px';
-        requestAnimationFrame(animateCursor);
-    }
-    animateCursor();
-
-    document.querySelectorAll('button, .glass, a, .carousel-dot').forEach(el => {
-        el.addEventListener('mouseenter', () => {
-            ring.style.width  = '60px';
-            ring.style.height = '60px';
-            ring.style.borderColor = 'rgba(255, 77, 133, 0.6)';
-            ring.style.background  = 'rgba(255, 77, 133, 0.05)';
-            dot.style.width  = '4px';
-            dot.style.height = '4px';
-        });
-        el.addEventListener('mouseleave', () => {
-            ring.style.width  = '40px';
-            ring.style.height = '40px';
-            ring.style.borderColor = 'rgba(255, 255, 255, 0.5)';
-            ring.style.background  = 'transparent';
-            dot.style.width  = '8px';
-            dot.style.height = '8px';
-        });
-    });
-})();
-
-// =============================================
-// GLASS CARD MOUSE HIGHLIGHT
-// =============================================
-if (!isTouchDevice) {
-    document.querySelectorAll('.glass').forEach(card => {
-        card.addEventListener('mousemove', e => {
-            const rect = card.getBoundingClientRect();
-            const x = ((e.clientX - rect.left) / rect.width) * 100;
-            const y = ((e.clientY - rect.top) / rect.height) * 100;
-            card.style.setProperty('--mouse-x', x + '%');
-            card.style.setProperty('--mouse-y', y + '%');
+        document.addEventListener('mousemove', e => {
+            mx = e.clientX;
+            my = e.clientY;
+            dot.style.left = mx + 'px';
+            dot.style.top = my + 'px';
+            if (glow) {
+                glow.style.left = mx + 'px';
+                glow.style.top = my + 'px';
+            }
         });
 
-        const highlight = card.querySelector('.glass-highlight');
-        if (highlight) {
-            card.addEventListener('mouseenter', () => {
-                gsap.fromTo(highlight,
-                    { left: '-100%' },
-                    { left: '200%', duration: 0.8, ease: 'power2.out' }
-                );
-            });
+        function animateCursor() {
+            cx += (mx - cx) * 0.15;
+            cy += (my - cy) * 0.15;
+            ring.style.left = cx + 'px';
+            ring.style.top = cy + 'px';
+            requestAnimationFrame(animateCursor);
         }
+        animateCursor();
+
+        document.querySelectorAll('button, .glass, a, .carousel-dot').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                ring.style.width = '60px';
+                ring.style.height = '60px';
+                ring.style.borderColor = 'rgba(255, 77, 133, 0.6)';
+            });
+            el.addEventListener('mouseleave', () => {
+                ring.style.width = '40px';
+                ring.style.height = '40px';
+                ring.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+            });
+        });
+    })();
+
+    // =============================================
+    // GLASS CARD MOUSE FOLLOW (Desktop only)
+    // =============================================
+    if (!isTouchDevice) {
+        document.querySelectorAll('.glass').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                card.style.setProperty('--mouse-x', x + '%');
+                card.style.setProperty('--mouse-y', y + '%');
+            });
+        });
+
+        document.querySelectorAll('.glass').forEach(card => {
+            const highlight = card.querySelector('.glass-highlight');
+            if (!highlight) return;
+            card.addEventListener('mouseenter', () => {
+                gsap.fromTo(highlight, { left: '-100%' }, { left: '200%', duration: 0.8, ease: 'power2.out' });
+            });
+        });
+    }
+
+    // =============================================
+    // PRELOADER
+    // =============================================
+    (function initPreloader() {
+        const preloader = document.getElementById('preloader');
+        const heartPath = preloader.querySelector('.preloader-heart path');
+        const heartFill = preloader.querySelector('.preloader-heart-fill');
+        const heartGlow = document.getElementById('preloaderGlow');
+        const preloaderText = document.getElementById('preloaderText');
+
+        const tl = gsap.timeline({
+            onComplete: () => {
+                createPreloaderBurst();
+                gsap.to(preloader, {
+                    opacity: 0,
+                    duration: 1,
+                    delay: 0.5,
+                    ease: 'power2.inOut',
+                    onComplete: () => {
+                        preloader.classList.add('done');
+                        preloader.style.display = 'none';
+                        animateHero();
+                    }
+                });
+            }
+        });
+
+        tl.to(heartPath, { strokeDashoffset: 0, duration: 1.8, ease: 'power2.inOut' })
+          .to(preloaderText, { opacity: 1, duration: 0.5 }, 0.5)
+          .to(heartGlow, { opacity: 0.6, duration: 1.2 }, 0.5)
+          .to(heartFill, { opacity: 1, duration: 0.6 }, 1.3)
+          .to(heartGlow, { scale: 1.8, opacity: 0, duration: 0.6 }, 1.8);
+
+        function createPreloaderBurst() {
+            const container = document.getElementById('preloaderParticles');
+            const colors = ['#FF4D85', '#FFB6D5', '#E0C3FC', '#FAD0C4'];
+            const cx = window.innerWidth / 2;
+            const cy = window.innerHeight / 2;
+
+            for (let i = 0; i < 30; i++) {
+                const p = document.createElement('div');
+                p.className = 'preloader-particle';
+                const size = Math.random() * 6 + 3;
+                p.style.width = size + 'px';
+                p.style.height = size + 'px';
+                p.style.background = colors[Math.floor(Math.random() * colors.length)];
+                p.style.left = cx + 'px';
+                p.style.top = cy + 'px';
+                container.appendChild(p);
+
+                const angle = (Math.PI * 2 * i) / 30;
+                const dist = 80 + Math.random() * 200;
+
+                gsap.to(p, {
+                    x: Math.cos(angle) * dist,
+                    y: Math.sin(angle) * dist,
+                    opacity: 0,
+                    scale: 0,
+                    duration: 0.8 + Math.random() * 0.4,
+                    ease: 'power2.out',
+                    delay: Math.random() * 0.15
+                });
+            }
+        }
+    })();
+
+    // =============================================
+    // HERO ANIMATIONS
+    // =============================================
+    function animateHero() {
+        const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+        tl.to('.hero-label span', { y: 0, opacity: 1, duration: 0.7, from: { y: 20, opacity: 0 } })
+          .to('.hero-title .line-1 span', { y: 0, duration: 0.9, ease: 'power4.out' }, 0.2)
+          .to('.hero-title .line-2 span', { y: 0, duration: 1, ease: 'power4.out' }, 0.4)
+          .to('.hero-date span', { y: 0, opacity: 1, duration: 0.7, from: { y: 15, opacity: 0 } }, 0.6)
+          .fromTo('.magnetic-btn', { y: 25, opacity: 0, scale: 0.95 }, { y: 0, opacity: 1, scale: 1, duration: 0.7 }, 0.8)
+          .to('#scrollIndicator', { opacity: 0.5, duration: 0.5 }, 1.2);
+    }
+
+    // =============================================
+    // MAGNETIC BUTTON (Desktop only)
+    // =============================================
+    if (!isTouchDevice) {
+        (function initMagneticBtn() {
+            const wrapper = document.getElementById('magneticWrapper');
+            const btn = document.getElementById('magneticBtn');
+            if (!wrapper || !btn) return;
+
+            wrapper.addEventListener('mousemove', e => {
+                const rect = wrapper.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                gsap.to(btn, { x: x * 0.25, y: y * 0.25, duration: 0.4, ease: 'power2.out' });
+            });
+
+            wrapper.addEventListener('mouseleave', () => {
+                gsap.to(btn, { x: 0, y: 0, duration: 0.6, ease: 'elastic.out(1, 0.5)' });
+            });
+        })();
+    }
+
+    // =============================================
+    // SMOOTH SCROLL
+    // =============================================
+    function scrollToSection(selector) {
+        const el = document.querySelector(selector);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    // =============================================
+    // COMPLIMENTS ANIMATIONS
+    // =============================================
+    gsap.from('.compliments-label', {
+        scrollTrigger: { trigger: '#complimentsSection', start: 'top 80%' },
+        y: 25, opacity: 0, duration: 0.7
     });
-}
 
-// =============================================
-// PRELOADER
-// =============================================
-(function initPreloader() {
-    const preloader    = document.getElementById('preloader');
-    const heartPath    = preloader.querySelector('.preloader-heart path');
-    const heartFill    = preloader.querySelector('.preloader-heart-fill');
-    const heartGlow    = document.getElementById('preloaderGlow');
-    const preloaderTxt = document.getElementById('preloaderText');
+    gsap.from('.compliments-title', {
+        scrollTrigger: { trigger: '#complimentsSection', start: 'top 75%' },
+        y: 35, opacity: 0, duration: 0.9, delay: 0.15
+    });
 
-    const tl = gsap.timeline({
-        onComplete() {
-            createBurst();
-            gsap.to(preloader, {
-                opacity: 0,
-                duration: 1,
-                delay: 0.5,
-                ease: 'power2.inOut',
-                onComplete() {
-                    preloader.style.display = 'none';
-                    animateHero();
+    gsap.from('.carousel-card', {
+        scrollTrigger: { trigger: '.carousel', start: 'top 85%' },
+        y: 50, opacity: 0, scale: 0.97,
+        duration: 0.7, stagger: 0.12, ease: 'power3.out'
+    });
+
+    // Carousel dots
+    const carousel = document.getElementById('carousel');
+    const dots = document.querySelectorAll('.carousel-dot');
+    const cards = document.querySelectorAll('.carousel-card');
+
+    carousel.addEventListener('scroll', () => {
+        const scrollLeft = carousel.scrollLeft;
+        const cardWidth = cards[0].offsetWidth + 20;
+        const idx = Math.round(scrollLeft / cardWidth);
+        dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    }, { passive: true });
+
+    dots.forEach(dot => {
+        dot.addEventListener('click', () => {
+            const idx = parseInt(dot.dataset.index);
+            const cardWidth = cards[0].offsetWidth + 20;
+            carousel.scrollTo({ left: idx * cardWidth, behavior: 'smooth' });
+        });
+    });
+
+    // =============================================
+    // MESSAGE FOG EFFECT
+    // =============================================
+    (function initFogEffect() {
+        const messageCard = document.getElementById('messageCard');
+        const fogOverlay = document.getElementById('fogOverlay');
+        const fogHint = document.getElementById('fogHint');
+
+        if (!fogOverlay || !messageCard) return;
+
+        let fogCanvas, fogCtx;
+        let fogRevealed = 0;
+        let isSetup = false;
+
+        function setupFogCanvas() {
+            if (isSetup) return;
+            isSetup = true;
+            
+            fogCanvas = document.createElement('canvas');
+            const rect = messageCard.getBoundingClientRect();
+            fogCanvas.width = rect.width;
+            fogCanvas.height = rect.height;
+            fogCtx = fogCanvas.getContext('2d');
+
+            fogCtx.fillStyle = '#1a0a12';
+            fogCtx.fillRect(0, 0, fogCanvas.width, fogCanvas.height);
+            updateFogMask();
+        }
+
+        function updateFogMask() {
+            const dataUrl = fogCanvas.toDataURL();
+            fogOverlay.style.webkitMaskImage = `url(${dataUrl})`;
+            fogOverlay.style.maskImage = `url(${dataUrl})`;
+        }
+
+        function wipe(x, y) {
+            if (!fogCtx) return;
+            const rect = messageCard.getBoundingClientRect();
+            const cx = x - rect.left;
+            const cy = y - rect.top;
+
+            fogCtx.globalCompositeOperation = 'destination-out';
+            const radius = 45;
+            const gradient = fogCtx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+            gradient.addColorStop(0, 'rgba(0,0,0,1)');
+            gradient.addColorStop(0.6, 'rgba(0,0,0,0.8)');
+            gradient.addColorStop(1, 'rgba(0,0,0,0)');
+            fogCtx.fillStyle = gradient;
+            fogCtx.beginPath();
+            fogCtx.arc(cx, cy, radius, 0, Math.PI * 2);
+            fogCtx.fill();
+
+            updateFogMask();
+
+            fogRevealed += 0.4;
+            if (fogRevealed > 12) {
+                gsap.to(fogHint, { opacity: 0, duration: 0.4 });
+            }
+            if (fogRevealed > 50) {
+                gsap.to(fogOverlay, { opacity: 0, duration: 1.2, ease: 'power2.out' });
+            }
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    setTimeout(setupFogCanvas, 200);
+                    observer.unobserve(entry.target);
                 }
             });
-        }
-    });
+        }, { threshold: 0.3 });
 
-    tl
-      .to(heartPath,    { strokeDashoffset: 0, duration: 2, ease: 'power2.inOut' })
-      .to(preloaderTxt, { opacity: 1, duration: 0.5 }, 0.5)
-      .to(heartGlow,    { opacity: 0.6, duration: 1.5, ease: 'power2.out' }, 0.5)
-      .to(heartFill,    { opacity: 1, duration: 0.8, ease: 'power2.out' }, 1.5)
-      .to(heartGlow,    { scale: 2, opacity: 0, duration: 0.8, ease: 'power2.out' }, 2.2);
+        observer.observe(messageCard);
 
-    function createBurst() {
-        const container = document.getElementById('preloaderParticles');
-        const colors    = ['#FF4D85','#FFB6D5','#E0C3FC','#FAD0C4','#FF6B9D'];
-        const cx = window.innerWidth / 2;
-        const cy = window.innerHeight / 2;
-
-        for (let i = 0; i < 30; i++) {
-            const p    = document.createElement('div');
-            p.className = 'preloader-particle';
-            const size = Math.random() * 8 + 3;
-            p.style.cssText = `
-                width:${size}px; height:${size}px;
-                background:${colors[Math.floor(Math.random()*colors.length)]};
-                left:${cx}px; top:${cy}px;
-            `;
-            container.appendChild(p);
-
-            const angle = (Math.PI * 2 * i) / 30 + (Math.random() - 0.5) * 0.5;
-            const dist  = 80 + Math.random() * 220;
-
-            gsap.to(p, {
-                x: Math.cos(angle) * dist,
-                y: Math.sin(angle) * dist,
-                opacity: 0,
-                scale: 0,
-                duration: 0.8 + Math.random() * 0.4,
-                ease: 'power2.out',
-                delay: Math.random() * 0.15
-            });
-        }
-    }
-})();
-
-// =============================================
-// HERO ANIMATIONS
-// =============================================
-function animateHero() {
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-
-    tl
-      .fromTo('.hero-label',
-          { y: 20, opacity: 0 },
-          { y: 0,  opacity: 1, duration: 0.8 }
-      )
-      .to('.hero-title .line-1 span', { y: 0, duration: 1,   ease: 'power4.out' }, 0.3)
-      .to('.hero-title .line-2 span', { y: 0, duration: 1.2, ease: 'power4.out' }, 0.5)
-      .fromTo('.hero-date',
-          { y: 15, opacity: 0 },
-          { y: 0,  opacity: 1, duration: 0.8 }, 0.8
-      )
-      .fromTo('.magnetic-btn',
-          { y: 30, opacity: 0, scale: 0.9 },
-          { y: 0,  opacity: 1, scale: 1, duration: 0.8 }, 1
-      )
-      .to('#scrollIndicator', { opacity: 0.5, duration: 0.6 }, 1.5);
-}
-
-// =============================================
-// MAGNETIC BUTTON + SCROLL
-// =============================================
-document.getElementById('magneticBtn').addEventListener('click', () => {
-    const target = document.getElementById('complimentsSection');
-    if (target) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-});
-
-// Десктоп: магнитный эффект
-if (!isTouchDevice) {
-    const wrapper = document.getElementById('magneticWrapper');
-    const btn     = document.getElementById('magneticBtn');
-
-    wrapper.addEventListener('mousemove', e => {
-        const rect = wrapper.getBoundingClientRect();
-        const x = e.clientX - rect.left - rect.width  / 2;
-        const y = e.clientY - rect.top  - rect.height / 2;
-        gsap.to(btn, { x: x * 0.3, y: y * 0.3, duration: 0.4, ease: 'power2.out' });
-    });
-
-    wrapper.addEventListener('mouseleave', () => {
-        gsap.to(btn, { x: 0, y: 0, duration: 0.6, ease: 'elastic.out(1, 0.5)' });
-    });
-}
-
-// =============================================
-// CAROUSEL
-// =============================================
-const carousel = document.getElementById('carousel');
-const dots     = document.querySelectorAll('.carousel-dot');
-const cards    = document.querySelectorAll('.carousel-card');
-
-// Обновление точек при скролле
-carousel.addEventListener('scroll', () => {
-    if (!cards.length) return;
-    const cardW = cards[0].offsetWidth + 20; // gap = 20px
-    const idx   = Math.round(carousel.scrollLeft / cardW);
-    dots.forEach((d, i) => {
-        d.classList.toggle('active', i === Math.min(idx, dots.length - 1));
-    });
-}, { passive: true });
-
-// Клик по точкам
-dots.forEach(dot => {
-    dot.addEventListener('click', () => {
-        const idx   = parseInt(dot.dataset.index);
-        const cardW = cards[0].offsetWidth + 20;
-        carousel.scrollTo({ left: idx * cardW, behavior: 'smooth' });
-    });
-});
-
-// Анимации при появлении
-gsap.from('.compliments-label', {
-    scrollTrigger: { trigger: '#complimentsSection', start: 'top 80%' },
-    y: 30, opacity: 0, duration: 0.8
-});
-
-gsap.from('.compliments-title', {
-    scrollTrigger: { trigger: '#complimentsSection', start: 'top 75%' },
-    y: 40, opacity: 0, duration: 1, delay: 0.2
-});
-
-gsap.from('.carousel-card', {
-    scrollTrigger: { trigger: '.carousel', start: 'top 85%' },
-    y: 60, opacity: 0, scale: 0.95,
-    duration: 0.8, stagger: 0.12, ease: 'power3.out'
-});
-
-// =============================================
-// MESSAGE / FOG EFFECT
-// Переработан: вместо canvas-mask используем
-// CSS clip-path / opacity + touch-reveal
-// =============================================
-(function initFogEffect() {
-    const messageCard      = document.getElementById('messageCard');
-    const fogOverlay       = document.getElementById('fogOverlay');
-    const fogHint          = document.getElementById('fogHint');
-    const fogTouchIndicator = document.getElementById('fogTouchIndicator');
-
-    if (!fogOverlay || !messageCard) return;
-
-    // Состояние раскрытия
-    let revealed = false;
-    let touchCount = 0;
-    const REVEAL_THRESHOLD = 8; // сколько касаний чтобы открыть
-
-    function handleRevealPoint(x, y) {
-        if (revealed) return;
-
-        touchCount++;
-
-        // Показываем индикатор касания
-        const rect = messageCard.getBoundingClientRect();
-        fogTouchIndicator.style.left = (x - rect.left) + 'px';
-        fogTouchIndicator.style.top  = (y - rect.top)  + 'px';
-        fogTouchIndicator.classList.add('active');
-
-        setTimeout(() => fogTouchIndicator.classList.remove('active'), 300);
-
-        // Прогресс раскрытия
-        const progress = Math.min(touchCount / REVEAL_THRESHOLD, 1);
-        fogOverlay.style.opacity = String(1 - progress * 0.85);
-
-        if (touchCount >= 3) {
-            gsap.to(fogHint, { opacity: 0, duration: 0.4 });
+        // Mouse events (desktop)
+        if (!isTouchDevice) {
+            messageCard.addEventListener('mousemove', e => wipe(e.clientX, e.clientY));
         }
 
-        if (touchCount >= REVEAL_THRESHOLD) {
-            fullyReveal();
-        }
-    }
+        // Touch events (mobile)
+        messageCard.addEventListener('touchstart', e => {
+            if (e.touches[0]) wipe(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: true });
 
-    function fullyReveal() {
-        if (revealed) return;
-        revealed = true;
-        gsap.to(fogOverlay, { opacity: 0, duration: 1.5, ease: 'power2.out' });
-        gsap.to(fogTouchIndicator, { opacity: 0, duration: 0.3 });
-    }
+        messageCard.addEventListener('touchmove', e => {
+            if (e.touches[0]) wipe(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: true });
 
-    // Мышь — постоянное движение
-    if (!isTouchDevice) {
-        messageCard.addEventListener('mousemove', e => {
-            handleRevealPoint(e.clientX, e.clientY);
+        gsap.from('.message-label', {
+            scrollTrigger: { trigger: '#messageSection', start: 'top 80%' },
+            y: 20, opacity: 0, duration: 0.7
         });
-    }
 
-    // Touch — каждое касание/движение
-    messageCard.addEventListener('touchstart', e => {
-        if (e.touches[0]) handleRevealPoint(e.touches[0].clientX, e.touches[0].clientY);
-    }, { passive: true });
+        gsap.from('.message-card', {
+            scrollTrigger: { trigger: '#messageSection', start: 'top 70%' },
+            y: 50, opacity: 0, scale: 0.97, duration: 0.9, ease: 'power3.out'
+        });
+    })();
 
-    messageCard.addEventListener('touchmove', e => {
-        if (e.touches[0]) handleRevealPoint(e.touches[0].clientX, e.touches[0].clientY);
-    }, { passive: true });
-
-    // Анимации секции
-    gsap.from('.message-label', {
-        scrollTrigger: { trigger: '#messageSection', start: 'top 80%' },
-        y: 20, opacity: 0, duration: 0.8
+    // =============================================
+    // FINALE ANIMATIONS
+    // =============================================
+    gsap.from('.finale-emoji', {
+        scrollTrigger: { trigger: '#finaleSection', start: 'top 70%' },
+        y: 25, opacity: 0, scale: 0.5, duration: 0.7, ease: 'back.out(2)'
     });
 
-    gsap.from('#messageCard', {
-        scrollTrigger: { trigger: '#messageSection', start: 'top 70%' },
-        y: 60, opacity: 0, scale: 0.95, duration: 1, ease: 'power3.out'
+    gsap.from('.finale-text', {
+        scrollTrigger: { trigger: '#finaleSection', start: 'top 65%' },
+        y: 35, opacity: 0, duration: 0.9, delay: 0.15
     });
-})();
 
-// =============================================
-// FINALE
-// =============================================
-gsap.from('.finale-emoji', {
-    scrollTrigger: { trigger: '#finaleSection', start: 'top 70%' },
-    y: 30, opacity: 0, scale: 0.5, duration: 0.8, ease: 'back.out(2)'
-});
+    gsap.from('.finale-subtext', {
+        scrollTrigger: { trigger: '#finaleSection', start: 'top 60%' },
+        y: 15, opacity: 0, duration: 0.7, delay: 0.35
+    });
 
-gsap.from('.finale-text', {
-    scrollTrigger: { trigger: '#finaleSection', start: 'top 65%' },
-    y: 40, opacity: 0, duration: 1, delay: 0.2
-});
+    gsap.from('.finale-heart-btn', {
+        scrollTrigger: { trigger: '#finaleSection', start: 'top 55%' },
+        scale: 0, opacity: 0, duration: 0.7, delay: 0.5, ease: 'back.out(2)'
+    });
 
-gsap.from('.finale-subtext', {
-    scrollTrigger: { trigger: '#finaleSection', start: 'top 60%' },
-    y: 20, opacity: 0, duration: 0.8, delay: 0.5
-});
+    gsap.from('.finale-heart-hint', {
+        scrollTrigger: { trigger: '#finaleSection', start: 'top 55%' },
+        y: 10, opacity: 0, duration: 0.5, delay: 0.7
+    });
 
-gsap.from('.finale-heart-btn', {
-    scrollTrigger: { trigger: '#finaleSection', start: 'top 55%' },
-    scale: 0, opacity: 0, duration: 0.8, delay: 0.7, ease: 'back.out(2)'
-});
+    // =============================================
+    // CONFETTI
+    // =============================================
+    const confCanvas = document.getElementById('confettiCanvas');
+    const confCtx = confCanvas.getContext('2d');
+    let confettiPieces = [];
+    let confAnimating = false;
 
-gsap.from('.finale-heart-hint', {
-    scrollTrigger: { trigger: '#finaleSection', start: 'top 55%' },
-    y: 10, opacity: 0, duration: 0.6, delay: 1
-});
-
-// =============================================
-// CONFETTI ENGINE
-// =============================================
-const confCanvas = document.getElementById('confettiCanvas');
-const confCtx    = confCanvas.getContext('2d');
-let confettiPieces = [];
-let confAnimating  = false;
-
-function resizeConf() {
-    confCanvas.width  = window.innerWidth;
-    confCanvas.height = window.innerHeight;
-}
-resizeConf();
-window.addEventListener('resize', resizeConf);
-
-class ConfettiPiece {
-    constructor() {
-        this.reset();
+    function resizeConfetti() {
+        confCanvas.width = window.innerWidth;
+        confCanvas.height = window.innerHeight;
     }
-    reset() {
-        this.x        = Math.random() * confCanvas.width;
-        this.y        = -10 - Math.random() * 100;
-        this.w        = Math.random() * 10 + 5;
-        this.h        = Math.random() * 6 + 3;
-        this.vx       = (Math.random() - 0.5) * 5;
-        this.vy       = Math.random() * 3 + 2;
-        this.rot      = Math.random() * 360;
-        this.rotSpeed = (Math.random() - 0.5) * 10;
-        this.opacity  = 1;
-        this.color    = [
-            '#FF4D85','#FFB6D5','#E0C3FC',
-            '#FAD0C4','#FF6B9D','#FFD700','#FF69B4','#DDA0DD'
-        ][Math.floor(Math.random() * 8)];
-        this.shape = Math.random() > 0.4 ? 'rect' : 'circle';
+    resizeConfetti();
+    window.addEventListener('resize', resizeConfetti);
+
+    class Confetti {
+        constructor() {
+            this.x = Math.random() * confCanvas.width;
+            this.y = -10 - Math.random() * 80;
+            this.w = Math.random() * 8 + 4;
+            this.h = Math.random() * 5 + 2;
+            this.vx = (Math.random() - 0.5) * 5;
+            this.vy = Math.random() * 3.5 + 2.5;
+            this.rot = Math.random() * 360;
+            this.rotSpeed = (Math.random() - 0.5) * 10;
+            this.opacity = 1;
+            this.color = ['#FF4D85', '#FFB6D5', '#E0C3FC', '#FAD0C4', '#FF6B9D', '#FFD700'][
+                Math.floor(Math.random() * 6)
+            ];
+            this.shape = Math.random() > 0.5 ? 'rect' : 'circle';
+        }
+
+        update() {
+            this.y += this.vy;
+            this.x += this.vx;
+            this.rot += this.rotSpeed;
+            this.vy += 0.03;
+            this.vx *= 0.99;
+            this.opacity -= 0.005;
+            return this.y < confCanvas.height + 20 && this.opacity > 0;
+        }
+
+        draw() {
+            confCtx.save();
+            confCtx.globalAlpha = Math.max(0, this.opacity);
+            confCtx.translate(this.x, this.y);
+            confCtx.rotate((this.rot * Math.PI) / 180);
+            confCtx.fillStyle = this.color;
+
+            if (this.shape === 'rect') {
+                confCtx.fillRect(-this.w / 2, -this.h / 2, this.w, this.h);
+            } else {
+                confCtx.beginPath();
+                confCtx.arc(0, 0, this.w / 2, 0, Math.PI * 2);
+                confCtx.fill();
+            }
+            confCtx.restore();
+        }
     }
-    update() {
-        this.y   += this.vy;
-        this.x   += this.vx;
-        this.rot += this.rotSpeed;
-        this.vy  += 0.03;
-        this.vx  *= 0.99;
-        this.opacity -= 0.003;
-        return this.y < confCanvas.height + 30 && this.opacity > 0;
+
+    function launchConfetti() {
+        const count = window.innerWidth < 500 ? 60 : 100;
+        for (let i = 0; i < count; i++) {
+            setTimeout(() => confettiPieces.push(new Confetti()), Math.random() * 400);
+        }
+        if (!confAnimating) {
+            confAnimating = true;
+            renderConfetti();
+        }
     }
-    draw() {
-        confCtx.save();
-        confCtx.globalAlpha = Math.max(0, this.opacity);
-        confCtx.translate(this.x, this.y);
-        confCtx.rotate((this.rot * Math.PI) / 180);
-        confCtx.fillStyle = this.color;
-        if (this.shape === 'rect') {
-            confCtx.fillRect(-this.w / 2, -this.h / 2, this.w, this.h);
+
+    function renderConfetti() {
+        confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
+        confettiPieces = confettiPieces.filter(p => {
+            const alive = p.update();
+            if (alive) p.draw();
+            return alive;
+        });
+        if (confettiPieces.length > 0) {
+            requestAnimationFrame(renderConfetti);
         } else {
-            confCtx.beginPath();
-            confCtx.arc(0, 0, this.w / 2, 0, Math.PI * 2);
-            confCtx.fill();
+            confAnimating = false;
         }
-        confCtx.restore();
-    }
-}
-
-function launchConfetti() {
-    const count = isTouchDevice ? 60 : 120;
-    for (let i = 0; i < count; i++) {
-        setTimeout(() => confettiPieces.push(new ConfettiPiece()), Math.random() * 600);
-    }
-    if (!confAnimating) {
-        confAnimating = true;
-        renderConfetti();
-    }
-}
-
-function renderConfetti() {
-    confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
-    confettiPieces = confettiPieces.filter(p => {
-        const alive = p.update();
-        if (alive) p.draw();
-        return alive;
-    });
-    if (confettiPieces.length > 0) {
-        requestAnimationFrame(renderConfetti);
-    } else {
-        confAnimating = false;
-    }
-}
-
-// =============================================
-// FINALE TRIGGER
-// =============================================
-let finaleTriggered = false;
-
-function triggerFinale() {
-    launchConfetti();
-
-    if (!finaleTriggered) {
-        finaleTriggered = true;
-
-        // Задержка для плавности
-        setTimeout(() => {
-            document.getElementById('finaleReveal').classList.add('show');
-        }, 400);
     }
 
-    // Анимация кнопки
-    gsap.fromTo('#finaleHeartBtn',
-        { scale: 1 },
-        { scale: 1.25, duration: 0.15, yoyo: true, repeat: 1, ease: 'power2.out' }
-    );
-}
+    // =============================================
+    // FINALE TRIGGER
+    // =============================================
+    let finaleTriggered = false;
 
-// Вешаем через addEventListener — надёжнее для iOS
-document.getElementById('finaleHeartBtn').addEventListener('click', triggerFinale);
+    function triggerFinale() {
+        launchConfetti();
+        if (!finaleTriggered) {
+            finaleTriggered = true;
+            setTimeout(() => {
+                document.getElementById('finaleReveal').classList.add('show');
+            }, 350);
+        }
 
-// Убираем onclick из HTML (уже удалён в разметке выше)
-
-// =============================================
-// PARTICLE TRAIL (только десктоп)
-// =============================================
-if (!isTouchDevice) {
-    const finale = document.getElementById('finaleSection');
-
-    finale.addEventListener('mousemove', e => {
-        const dot = document.createElement('div');
-        const size = Math.random() * 6 + 3;
-        const color = ['#FF4D85','#FFB6D5','#E0C3FC'][Math.floor(Math.random() * 3)];
-
-        dot.style.cssText = `
-            position: fixed;
-            width: ${size}px;
-            height: ${size}px;
-            background: ${color};
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 99998;
-            left: ${e.clientX}px;
-            top: ${e.clientY}px;
-            transform: translate(-50%, -50%);
-        `;
-        document.body.appendChild(dot);
-
-        gsap.to(dot, {
-            opacity: 0,
-            scale: 0,
-            y: Math.random() * 30 - 15,
-            x: Math.random() * 30 - 15,
-            duration: 0.6 + Math.random() * 0.4,
-            ease: 'power2.out',
-            onComplete: () => dot.parentNode && dot.remove()
+        gsap.fromTo('#finaleHeartBtn', { scale: 1 }, {
+            scale: 1.25, duration: 0.12, yoyo: true, repeat: 1, ease: 'power2.out'
         });
-    });
-}
-
-// =============================================
-// ОБНОВЛЕНИЕ ScrollTrigger после загрузки шрифтов
-// =============================================
-if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(() => {
-        ScrollTrigger.refresh();
-    });
-}
-
-// iOS: обновляем ScrollTrigger после resize (адресная строка браузера)
-window.addEventListener('resize', () => {
-    clearTimeout(window._stRefreshTimer);
-    window._stRefreshTimer = setTimeout(() => ScrollTrigger.refresh(), 200);
-});
+    }
 </script>
+
 </body>
 </html>
+```
+
+## Ключевые исправления для iPhone:
+
+| Проблема | Решение |
+|----------|---------|
+| **100vh включает адресную строку** | Добавлена CSS переменная `--vh` и JS для расчёта реальной высоты |
+| **Safe Area (чёлка)** | `viewport-fit=cover` + `env(safe-area-inset-*)` |
+| **Backdrop-filter** | Добавлены `-webkit-` префиксы везде |
+| **Touch events** | `{ passive: true }` для плавной прокрутки |
+| **Hover на touch** | `@media (hover: hover)` для разделения стилей |
+| **Курсор** | Скрыт только на desktop через медиа-запросы |
+| **Rubber-band scroll** | `overscroll-behavior: none` |
+| **Tap highlight** | `-webkit-tap-highlight-color: transparent` |
+| **Кнопки** | `touch-action: manipulation` для быстрого отклика |
+| **WebGL** | Fallback на CSS градиент если не поддерживается |
