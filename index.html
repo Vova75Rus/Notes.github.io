@@ -1,89 +1,47 @@
-# Исправленная версия для iPhone 13/14/15
-
-Основные исправления:
-1. **100vh проблема** — на iOS Safari высота включает адресную строку
-2. **Safe Area Insets** — учёт "чёлки" и закруглений
-3. **Touch events** — улучшенная обработка касаний
-4. **Backdrop-filter** — webkit префиксы
-5. **WebGL fallback** — корректный запасной вариант
-6. **Убраны "text"** — ошибки в HTML
-
-```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Для Арины 💖 С 8 Марта</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Для Арины 💖 С 8 Марта</title>
-    <meta name="description" content="Персональная открытка к 8 Марта для самой прекрасной Арины">
     <meta name="theme-color" content="#FF4D85">
-    <meta property="og:title" content="Для тебя, Арина 🌸">
-    <meta property="og:description" content="Открой, чтобы увидеть кое-что особенное 💝">
 
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=Montserrat:wght@200;300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;1,400;1,600&family=Montserrat:wght@300;400;500&family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,900&display=swap" rel="stylesheet">
 
-    <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
     <style>
-        /* =============================================
-           CUSTOM PROPERTIES
-           ============================================= */
         :root {
-            --pink-deep: #FF4D85;
+            --pink-deep:   #FF4D85;
             --pink-pastel: #FAD0C4;
-            --pink-cold: #E0C3FC;
-            --pink-hot: #FF6B9D;
-            --pink-neon: #FF2D78;
-            --glass-bg: rgba(255, 255, 255, 0.08);
-            --glass-bg-hover: rgba(255, 255, 255, 0.14);
-            --glass-border: rgba(255, 255, 255, 0.18);
-            --glass-border-hover: rgba(255, 255, 255, 0.35);
-            --glass-blur: 20px;
-            --glass-shadow: 0 8px 32px rgba(255, 77, 133, 0.12);
-            --glass-shadow-hover: 0 16px 48px rgba(255, 77, 133, 0.25);
-            --glass-inner-glow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
-            --text-white: #FFFFFF;
-            --text-pearl: #FDEBFF;
-            --text-muted: rgba(255, 255, 255, 0.6);
-            --font-display: 'Playfair Display', serif;
+            --pink-cold:   #E0C3FC;
+            --pink-hot:    #FF6B9D;
+            --glass-bg:    rgba(255,255,255,0.08);
+            --glass-border:rgba(255,255,255,0.18);
+            --glass-blur:  18px;
+            --text-white:  #FFFFFF;
+            --text-pearl:  #FDEBFF;
+            --text-muted:  rgba(255,255,255,0.55);
+            --font-display:'Playfair Display', serif;
             --font-accent: 'Cormorant Garamond', serif;
-            --font-body: 'Montserrat', sans-serif;
-            --radius: 24px;
-            --radius-lg: 32px;
+            --font-body:   'Montserrat', sans-serif;
+            --radius:      24px;
+            --radius-lg:   32px;
             --radius-pill: 50px;
-            
-            /* iOS Safe Area */
-            --sat: env(safe-area-inset-top, 0px);
-            --sar: env(safe-area-inset-right, 0px);
-            --sab: env(safe-area-inset-bottom, 0px);
-            --sal: env(safe-area-inset-left, 0px);
-            
-            /* Real viewport height for iOS */
-            --vh: 1vh;
         }
 
-        /* =============================================
-           RESET
-           ============================================= */
         *, *::before, *::after {
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        html {
-            overflow-x: hidden;
-            scroll-behavior: auto;
-            /* Prevent iOS bounce */
-            overscroll-behavior: none;
-        }
+        html { overflow-x: hidden; }
 
         body {
             font-family: var(--font-body);
@@ -91,1739 +49,1082 @@
             background: #1a0a12;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            /* iOS specific */
-            -webkit-text-size-adjust: 100%;
-            -webkit-tap-highlight-color: transparent;
-            /* Safe area padding */
-            padding: var(--sat) var(--sar) var(--sab) var(--sal);
         }
 
-        /* Hide cursor only on non-touch devices */
-        @media (hover: hover) and (pointer: fine) {
-            body { cursor: none; }
-        }
-
-        a { text-decoration: none; color: inherit; }
-        button { 
-            border: none; 
-            outline: none; 
+        button {
+            border: none; outline: none;
             font-family: inherit;
+            cursor: pointer;
             -webkit-appearance: none;
             appearance: none;
-            background: transparent;
+            background: none;
         }
-        
-        /* Touch devices - normal cursor */
-        @media (hover: none), (pointer: coarse) {
-            button { cursor: pointer; }
-        }
-        
-        ::selection { background: rgba(255, 77, 133, 0.4); color: white; }
 
-        /* =============================================
-           CUSTOM CURSOR - Desktop only
-           ============================================= */
-        .cursor-dot, .cursor-ring, .cursor-glow {
-            display: none;
-        }
-        
+        /* ── CURSOR (desktop only) ── */
+        .cursor-dot, .cursor-ring { display: none; }
+
         @media (hover: hover) and (pointer: fine) {
+            body { cursor: none; }
+            button { cursor: none; }
+
             .cursor-dot {
                 display: block;
                 position: fixed;
-                width: 8px;
-                height: 8px;
-                background: var(--text-white);
+                width: 8px; height: 8px;
+                background: #fff;
                 border-radius: 50%;
                 pointer-events: none;
                 z-index: 100000;
                 mix-blend-mode: difference;
-                transform: translate(-50%, -50%);
-                transition: width 0.3s, height 0.3s, background 0.3s;
+                transform: translate(-50%,-50%);
             }
-
             .cursor-ring {
                 display: block;
                 position: fixed;
-                width: 40px;
-                height: 40px;
-                border: 1.5px solid rgba(255, 255, 255, 0.5);
+                width: 40px; height: 40px;
+                border: 1.5px solid rgba(255,255,255,0.5);
                 border-radius: 50%;
                 pointer-events: none;
                 z-index: 99999;
-                transform: translate(-50%, -50%);
-                transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                            height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                            border-color 0.3s,
-                            background 0.3s;
-            }
-
-            .cursor-glow {
-                display: block;
-                position: fixed;
-                width: 200px;
-                height: 200px;
-                border-radius: 50%;
-                background: radial-gradient(circle, rgba(255, 77, 133, 0.12) 0%, transparent 70%);
-                pointer-events: none;
-                z-index: 1;
-                transform: translate(-50%, -50%);
+                transform: translate(-50%,-50%);
+                transition: width .4s, height .4s, border-color .3s;
             }
         }
 
-        /* =============================================
-           WEBGL CANVAS (FLUID BACKGROUND)
-           ============================================= */
+        /* ── BACKGROUND CANVAS ── */
         #fluid-canvas {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             z-index: 0;
         }
 
-        /* =============================================
-           LIGHT ORBS
-           ============================================= */
+        .bg-fallback {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            background: radial-gradient(ellipse at 30% 30%, #3a0a2a, #1a0a12 50%, #0d0520);
+            animation: bgShift 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes bgShift {
+            0%   { background: radial-gradient(ellipse at 20% 20%, #3a0a2a, #1a0a12 50%, #0d0520); }
+            50%  { background: radial-gradient(ellipse at 70% 60%, #2a0a3a, #1a0a15 50%, #0d0509); }
+            100% { background: radial-gradient(ellipse at 40% 80%, #3a0515, #150a1a 50%, #050510); }
+        }
+
+        /* ── ORBS ── */
         .orbs-container {
-            position: fixed;
-            top: 0; left: 0;
+            position: fixed; top: 0; left: 0;
             width: 100%; height: 100%;
-            z-index: 1;
-            pointer-events: none;
-            overflow: hidden;
+            z-index: 1; pointer-events: none; overflow: hidden;
         }
-
         .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.4;
-            /* Optimize for iOS */
+            position: absolute; border-radius: 50%;
+            filter: blur(70px); opacity: 0.35;
             will-change: transform;
-            -webkit-transform: translateZ(0);
-            transform: translateZ(0);
         }
-
         .orb-1 {
-            width: 300px; height: 300px;
-            background: radial-gradient(circle, rgba(255, 77, 133, 0.5) 0%, transparent 70%);
+            width: 350px; height: 350px;
+            background: radial-gradient(circle, rgba(255,77,133,.5) 0%, transparent 70%);
             top: -10%; left: -10%;
-            animation: orbDrift1 25s ease-in-out infinite;
+            animation: orb1 25s ease-in-out infinite;
         }
-
         .orb-2 {
-            width: 250px; height: 250px;
-            background: radial-gradient(circle, rgba(224, 195, 252, 0.4) 0%, transparent 70%);
-            top: 50%; right: -10%;
-            animation: orbDrift2 30s ease-in-out infinite;
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(224,195,252,.4) 0%, transparent 70%);
+            top: 50%; right: -8%;
+            animation: orb2 30s ease-in-out infinite;
+        }
+        @keyframes orb1 {
+            0%,100%{ transform: translate(0,0) scale(1); }
+            33%    { transform: translate(120px,80px) scale(1.15); }
+            66%    { transform: translate(50px,200px) scale(0.9); }
+        }
+        @keyframes orb2 {
+            0%,100%{ transform: translate(0,0) scale(1); }
+            50%    { transform: translate(-100px,-60px) scale(1.1); }
         }
 
-        .orb-3 {
-            width: 200px; height: 200px;
-            background: radial-gradient(circle, rgba(250, 208, 196, 0.35) 0%, transparent 70%);
-            bottom: -5%; left: 30%;
-            animation: orbDrift3 20s ease-in-out infinite;
-        }
-
-        .orb-4 {
-            width: 180px; height: 180px;
-            background: radial-gradient(circle, rgba(255, 107, 157, 0.3) 0%, transparent 70%);
-            top: 30%; left: 50%;
-            animation: orbDrift4 35s ease-in-out infinite;
-        }
-
-        @keyframes orbDrift1 {
-            0%, 100% { transform: translate(0, 0) scale(1) translateZ(0); }
-            25% { transform: translate(100px, 70px) scale(1.2) translateZ(0); }
-            50% { transform: translate(50px, 150px) scale(0.9) translateZ(0); }
-            75% { transform: translate(-30px, 100px) scale(1.1) translateZ(0); }
-        }
-
-        @keyframes orbDrift2 {
-            0%, 100% { transform: translate(0, 0) scale(1) translateZ(0); }
-            33% { transform: translate(-80px, -50px) scale(1.15) translateZ(0); }
-            66% { transform: translate(-40px, 80px) scale(0.85) translateZ(0); }
-        }
-
-        @keyframes orbDrift3 {
-            0%, 100% { transform: translate(0, 0) scale(1) translateZ(0); }
-            50% { transform: translate(70px, -70px) scale(1.3) translateZ(0); }
-        }
-
-        @keyframes orbDrift4 {
-            0%, 100% { transform: translate(0, 0) scale(1) translateZ(0); }
-            25% { transform: translate(-50px, 40px) scale(1.1) translateZ(0); }
-            50% { transform: translate(40px, -30px) scale(0.9) translateZ(0); }
-            75% { transform: translate(20px, 50px) scale(1.15) translateZ(0); }
-        }
-
-        /* =============================================
-           PRELOADER
-           ============================================= */
+        /* ── PRELOADER ── */
         .preloader {
-            position: fixed;
-            top: 0; left: 0;
+            position: fixed; top: 0; left: 0;
             width: 100%; height: 100%;
-            /* iOS fix for 100vh */
-            height: calc(var(--vh, 1vh) * 100);
-            min-height: -webkit-fill-available;
-            background: radial-gradient(ellipse at center, #2a0a1a 0%, #0d0509 100%);
+            background: radial-gradient(ellipse at center, #2a0a1a, #0d0509);
             z-index: 50000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
         }
-
-        .preloader.done {
-            pointer-events: none;
+        .preloader-heart-wrap {
+            position: relative; width: 110px; height: 110px;
         }
-
-        .preloader-heart-container {
-            position: relative;
-            width: 100px;
-            height: 100px;
-        }
-
-        .preloader-heart {
-            width: 100%;
-            height: 100%;
-        }
-
-        .preloader-heart svg {
-            width: 100%;
-            height: 100%;
-            filter: drop-shadow(0 0 30px rgba(255, 77, 133, 0.6));
-        }
-
-        .preloader-heart path {
-            fill: none;
-            stroke: url(#preloaderHeartGrad);
-            stroke-width: 2;
-            stroke-dasharray: 300;
-            stroke-dashoffset: 300;
-            filter: drop-shadow(0 0 8px rgba(255, 77, 133, 0.5));
-        }
-
-        .preloader-heart-fill {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            opacity: 0;
-        }
-
+        .preloader-heart svg,
         .preloader-heart-fill svg {
             width: 100%; height: 100%;
+            filter: drop-shadow(0 0 30px rgba(255,77,133,.6));
         }
-
-        .preloader-heart-fill path {
-            fill: url(#preloaderHeartFillGrad);
+        .preloader-heart path {
+            fill: none;
+            stroke: url(#hGrad);
+            stroke-width: 2.5;
+            stroke-dasharray: 310;
+            stroke-dashoffset: 310;
         }
-
-        .preloader-heart-glow {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 150px; height: 150px;
+        .preloader-heart-fill {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%; opacity: 0;
+        }
+        .preloader-glow {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%,-50%);
+            width: 180px; height: 180px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(255, 77, 133, 0.3) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255,77,133,.35) 0%, transparent 70%);
             opacity: 0;
         }
-
         .preloader-text {
-            font-family: var(--font-body);
-            font-size: 12px;
-            font-weight: 300;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-top: 30px;
-            opacity: 0;
+            font-size: 12px; font-weight: 300;
+            letter-spacing: 4px; text-transform: uppercase;
+            color: var(--text-muted); margin-top: 36px; opacity: 0;
         }
-
         .preloader-particles {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%; pointer-events: none;
         }
+        .pp { position: absolute; border-radius: 50%; opacity: 0; }
 
-        .preloader-particle {
-            position: absolute;
-            border-radius: 50%;
-            opacity: 0;
-        }
-
-        /* =============================================
-           GLASS CARD BASE
-           ============================================= */
+        /* ── GLASS ── */
         .glass {
             background: var(--glass-bg);
             -webkit-backdrop-filter: blur(var(--glass-blur));
             backdrop-filter: blur(var(--glass-blur));
             border: 1px solid var(--glass-border);
             border-radius: var(--radius);
-            box-shadow: var(--glass-shadow), var(--glass-inner-glow);
-            position: relative;
-            overflow: hidden;
-            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            /* iOS optimization */
-            -webkit-transform: translateZ(0);
-            transform: translateZ(0);
+            box-shadow: 0 8px 32px rgba(255,77,133,.1),
+                        inset 0 1px 0 rgba(255,255,255,.2);
+            position: relative; overflow: hidden;
         }
-
         .glass::before {
             content: '';
-            position: absolute;
-            top: 0; left: 0;
+            position: absolute; top: 0; left: 0;
             width: 100%; height: 100%;
-            background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 1;
+            background: linear-gradient(135deg, rgba(255,255,255,.1) 0%, transparent 50%);
+            pointer-events: none; z-index: 1;
         }
-
-        .glass::after {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: radial-gradient(ellipse at var(--mouse-x, 50%) var(--mouse-y, 50%),
-                rgba(255, 255, 255, 0.08) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 2;
-            opacity: 0;
-            transition: opacity 0.5s;
-        }
-
-        /* Only apply hover effects on devices with hover capability */
-        @media (hover: hover) {
-            .glass:hover::after {
-                opacity: 1;
-            }
-
-            .glass:hover {
-                background: var(--glass-bg-hover);
-                border-color: var(--glass-border-hover);
-                box-shadow: var(--glass-shadow-hover), var(--glass-inner-glow);
-                transform: translateY(-4px) scale(1.02);
-            }
-        }
-
-        .glass-highlight {
-            position: absolute;
-            top: 0; left: -100%;
+        .glass-shine {
+            position: absolute; top: 0; left: -100%;
             width: 50%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,.13), transparent);
             transform: skewX(-20deg);
-            pointer-events: none;
-            z-index: 3;
+            pointer-events: none; z-index: 3;
         }
 
-        /* =============================================
-           CONTENT WRAPPER
-           ============================================= */
-        .content {
-            position: relative;
-            z-index: 10;
-        }
+        /* ── LAYOUT ── */
+        .content { position: relative; z-index: 10; }
 
         .section {
             min-height: 100vh;
-            /* iOS Safari fix */
-            min-height: calc(var(--vh, 1vh) * 100);
-            min-height: -webkit-fill-available;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            min-height: 100dvh;
+            display: flex; align-items: center; justify-content: center;
             padding: 80px 24px;
-            padding-top: calc(80px + var(--sat));
-            padding-bottom: calc(80px + var(--sab));
+            padding-top:    max(80px, env(safe-area-inset-top, 0px) + 40px);
+            padding-bottom: max(80px, env(safe-area-inset-bottom, 0px) + 40px);
             position: relative;
         }
+        .section-inner { max-width: 960px; width: 100%; }
 
-        .section-inner {
-            max-width: 1000px;
-            width: 100%;
-            position: relative;
-        }
-
-        /* =============================================
-           SCREEN 1: HERO
-           ============================================= */
-        .hero {
-            flex-direction: column;
-            text-align: center;
-            gap: 0;
-        }
+        /* ── HERO ── */
+        .hero { flex-direction: column; text-align: center; }
 
         .hero-label {
-            font-family: var(--font-body);
-            font-size: 11px;
-            font-weight: 400;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 24px;
-            overflow: hidden;
+            font-size: 11px; font-weight: 400;
+            letter-spacing: 6px; text-transform: uppercase;
+            color: var(--text-muted); margin-bottom: 28px;
         }
-
-        .hero-label span {
-            display: inline-block;
-        }
-
         .hero-title {
             font-family: var(--font-display);
-            font-weight: 400;
-            line-height: 1.2;
-            margin-bottom: 10px;
-            overflow: hidden;
+            font-weight: 400; line-height: 1.15; margin-bottom: 10px;
         }
+        .hero-title .line { display: block; overflow: hidden; }
+        .hero-title .line span { display: inline-block; transform: translateY(120%); }
 
-        .hero-title .line {
-            display: block;
-            overflow: hidden;
+        .line-1 span {
+            font-size: clamp(26px, 5.5vw, 60px);
+            font-weight: 300; font-style: italic; color: var(--text-pearl);
         }
-
-        .hero-title .line span {
-            display: inline-block;
-            transform: translateY(120%);
-        }
-
-        .hero-title .line-1 span {
-            font-size: clamp(28px, 7vw, 72px);
-            font-weight: 300;
-            font-style: italic;
-            color: var(--text-pearl);
-        }
-
-        .hero-title .line-2 span {
-            font-size: clamp(44px, 11vw, 110px);
+        .line-2 span {
+            font-size: clamp(44px, 9vw, 96px);
             font-weight: 900;
-            background: linear-gradient(135deg, #FFFFFF 0%, #FFB6D5 40%, #E0C3FC 70%, #FFFFFF 100%);
+            background: linear-gradient(135deg, #fff 0%, #FFB6D5 40%, #E0C3FC 70%, #fff 100%);
             background-size: 300% 100%;
-            -webkit-background-clip: text;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shimmer 4s ease infinite;
-            filter: drop-shadow(0 0 20px rgba(255, 77, 133, 0.3));
+            animation: shimmer 4s linear infinite;
         }
-
         @keyframes shimmer {
-            0% { background-position: 300% center; }
-            100% { background-position: -300% center; }
+            0%  { background-position: 300% center; }
+            100%{ background-position: -300% center; }
         }
 
         .hero-date {
-            font-family: var(--font-body);
-            font-size: 13px;
-            font-weight: 300;
-            letter-spacing: 3px;
-            color: var(--text-muted);
-            margin-top: 16px;
-            margin-bottom: 50px;
-            overflow: hidden;
+            font-size: 13px; font-weight: 300;
+            letter-spacing: 4px; color: var(--text-muted);
+            margin-top: 18px; margin-bottom: 48px;
         }
 
-        .hero-date span {
-            display: inline-block;
-        }
-
-        /* Button */
-        .magnetic-btn-wrapper {
-            display: inline-block;
-            position: relative;
-        }
-
-        .magnetic-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 16px 36px;
-            background: rgba(255, 255, 255, 0.07);
+        .hero-btn {
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 16px 40px;
+            background: rgba(255,255,255,.07);
             -webkit-backdrop-filter: blur(20px);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255,255,255,.2);
             border-radius: var(--radius-pill);
-            color: var(--text-white);
-            font-family: var(--font-body);
-            font-size: 13px;
-            font-weight: 400;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            position: relative;
-            overflow: hidden;
-            /* iOS tap fix */
-            -webkit-touch-callout: none;
+            color: #fff; font-size: 13px; font-weight: 400;
+            letter-spacing: 3px; text-transform: uppercase;
+            transition: all .4s ease;
             touch-action: manipulation;
         }
-
-        .magnetic-btn::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            transition: left 0.6s;
-        }
+        .hero-btn:active { transform: scale(.96); opacity: .85; }
 
         @media (hover: hover) {
-            .magnetic-btn:hover::before {
-                left: 100%;
-            }
-
-            .magnetic-btn:hover {
-                background: rgba(255, 255, 255, 0.14);
-                border-color: rgba(255, 255, 255, 0.4);
-                box-shadow: 0 0 40px rgba(255, 77, 133, 0.2), inset 0 1px 0 rgba(255,255,255,0.3);
+            .hero-btn:hover {
+                background: rgba(255,255,255,.13);
+                border-color: rgba(255,255,255,.4);
+                box-shadow: 0 0 30px rgba(255,77,133,.2);
             }
         }
 
-        /* Active state for touch */
-        .magnetic-btn:active {
-            background: rgba(255, 255, 255, 0.14);
-            transform: scale(0.98);
-        }
-
-        .magnetic-btn .btn-arrow {
-            display: inline-block;
-            transition: transform 0.3s;
-        }
-
-        /* Scroll Indicator */
-        .scroll-indicator {
-            position: absolute;
-            bottom: calc(30px + var(--sab));
-            left: 50%;
+        .scroll-ind {
+            position: absolute; bottom: 28px; left: 50%;
             transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
             opacity: 0;
         }
-
         .scroll-line {
-            width: 1px;
-            height: 40px;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
-            position: relative;
-            overflow: hidden;
+            width: 1px; height: 44px;
+            background: linear-gradient(to bottom, rgba(255,255,255,.3), transparent);
+            position: relative; overflow: hidden; margin: 0 auto;
         }
-
         .scroll-line::after {
             content: '';
-            position: absolute;
-            top: -100%;
-            width: 100%;
-            height: 50%;
-            background: var(--text-white);
-            animation: scrollLineMove 2s ease-in-out infinite;
+            position: absolute; top: -50%;
+            width: 100%; height: 50%;
+            background: #fff;
+            animation: slideLine 2s ease-in-out infinite;
+        }
+        @keyframes slideLine {
+            0%  { top: -50%; }
+            100%{ top: 150%; }
         }
 
-        @keyframes scrollLineMove {
-            0% { top: -50%; }
-            100% { top: 150%; }
-        }
+        /* ─────────────────────────────────────────
+           КАРУСЕЛЬ  — полный переписан
+           ───────────────────────────────────────── */
+        .compliments-section { overflow: visible; }
 
-        /* =============================================
-           SCREEN 2: COMPLIMENTS CAROUSEL
-           ============================================= */
-        .compliments {
-            overflow: hidden;
+        .compliments-header { text-align: center; margin-bottom: 44px; }
+        .c-label {
+            font-size: 11px; font-weight: 400;
+            letter-spacing: 5px; text-transform: uppercase;
+            color: var(--text-muted); margin-bottom: 14px;
         }
-
-        .compliments-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .compliments-label {
-            font-family: var(--font-body);
-            font-size: 11px;
-            font-weight: 400;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-        }
-
-        .compliments-title {
+        .c-title {
             font-family: var(--font-display);
-            font-size: clamp(28px, 6vw, 56px);
-            font-weight: 700;
-            font-style: italic;
-            color: var(--text-white);
+            font-size: clamp(26px, 5vw, 48px);
+            font-weight: 700; font-style: italic;
         }
 
-        .carousel {
+        /*
+         * КЛЮЧЕВЫЕ ИСПРАВЛЕНИЯ КАРУСЕЛИ:
+         * 1. touch-action: pan-x  →  горизонтальный свайп НЕ перехватывает
+         *    вертикальный скролл страницы
+         * 2. overscroll-behavior-x: contain  →  не пробрасывает в body
+         * 3. Убрали padding-left хитрый — он ломал snap на iOS
+         */
+        .carousel-track {
             display: flex;
-            gap: 20px;
-            padding: 20px 0;
+            gap: 18px;
             overflow-x: auto;
+            overflow-y: visible;          /* страница скроллит вертикально */
             scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
-            -ms-overflow-style: none;
-            padding-left: max(20px, calc((100vw - 1000px) / 2));
-            padding-right: 20px;
-            /* iOS scroll fix */
-            -webkit-scroll-snap-type: x mandatory;
+            overscroll-behavior-x: contain;
+            touch-action: pan-x;          /* только горизонталь */
+            padding: 10px 24px 20px;
+            /* Центрируем первую карточку */
+            scroll-padding-left: 24px;
         }
+        .carousel-track::-webkit-scrollbar { display: none; }
 
-        .carousel::-webkit-scrollbar { display: none; }
-
-        .carousel-card {
-            min-width: 280px;
-            max-width: 320px;
-            padding: 36px 28px;
-            scroll-snap-align: center;
-            -webkit-scroll-snap-align: center;
-            flex-shrink: 0;
+        .c-card {
+            flex: 0 0 280px;
+            scroll-snap-align: start;
+            padding: 32px 24px;
             text-align: center;
             border-radius: var(--radius-lg);
         }
 
-        .carousel-card .card-number {
+        @media (min-width: 480px) { .c-card { flex: 0 0 300px; } }
+        @media (min-width: 768px) { .c-card { flex: 0 0 320px; } }
+
+        .c-num {
             font-family: var(--font-display);
-            font-size: 52px;
-            font-weight: 900;
-            font-style: italic;
-            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%);
-            -webkit-background-clip: text;
+            font-size: 52px; font-weight: 900; font-style: italic;
+            background: linear-gradient(135deg, rgba(255,255,255,.15), rgba(255,255,255,.04));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 1;
-            margin-bottom: 16px;
-            position: relative;
-            z-index: 4;
+            line-height: 1; margin-bottom: 18px; position: relative; z-index: 4;
         }
-
-        .carousel-card .card-text {
+        .c-text {
             font-family: var(--font-accent);
-            font-size: 20px;
-            font-weight: 400;
-            font-style: italic;
-            line-height: 1.6;
-            color: var(--text-pearl);
-            position: relative;
-            z-index: 4;
+            font-size: 20px; font-weight: 400; font-style: italic;
+            line-height: 1.65; color: var(--text-pearl);
+            position: relative; z-index: 4;
         }
-
-        .carousel-card .card-emoji {
-            font-size: 36px;
-            display: block;
-            margin-top: 16px;
-            position: relative;
-            z-index: 4;
+        .c-emoji {
+            font-size: 34px; display: block;
+            margin-top: 16px; position: relative; z-index: 4;
         }
 
         .carousel-dots {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 24px;
+            display: flex; justify-content: center;
+            gap: 6px; margin-top: 20px;
         }
-
-        .carousel-dot {
-            width: 8px;
-            height: 8px;
+        .c-dot {
+            width: 7px; height: 7px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            transition: all 0.3s;
-            /* Touch target size */
-            padding: 10px;
-            margin: -10px;
-            background-clip: content-box;
+            background: rgba(255,255,255,.2);
+            transition: all .3s;
+            cursor: pointer;
+            /* увеличенная зона тапа */
+            padding: 8px; margin: -8px;
+            touch-action: manipulation;
         }
-
-        .carousel-dot.active {
-            background: var(--text-white);
-            width: 24px;
-            border-radius: 4px;
-            background-clip: content-box;
+        .c-dot::after {
+            /* визуальная точка через псевдоэлемент */
+            content: '';
+            display: block;
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: inherit;
         }
-
-        /* =============================================
-           SCREEN 3: MESSAGE (FOG EFFECT)
-           ============================================= */
-        .message-section {
-            flex-direction: column;
-            text-align: center;
+        .c-dot.active {
+            background: #fff;
+            width: 22px; border-radius: 3px;
         }
+        .c-dot.active::after { width: 22px; border-radius: 3px; }
 
-        .message-label {
-            font-family: var(--font-body);
-            font-size: 11px;
-            font-weight: 400;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 24px;
+        /* ─────────────────────────────────────────
+           ПОСЛАНИЕ С ТУМАНОМ
+           Полностью переписан: никакого canvas-mask,
+           никаких CSS mask (не работают на Safari).
+           Используем: div поверх с blur + opacity,
+           который исчезает при касаниях.
+           ───────────────────────────────────────── */
+        .message-section { flex-direction: column; text-align: center; }
+        .m-label {
+            font-size: 11px; font-weight: 400;
+            letter-spacing: 5px; text-transform: uppercase;
+            color: var(--text-muted); margin-bottom: 28px;
         }
 
         .message-card {
-            max-width: 600px;
-            width: 100%;
+            max-width: 620px; width: 100%;
             margin: 0 auto;
-            padding: 50px 28px;
+            padding: 48px 32px;
             border-radius: var(--radius-lg);
             position: relative;
-            min-height: 380px;
+            /* Важно: touch-action: none чтобы fog ловил тач */
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
-        .message-envelope-icon {
-            font-size: 40px;
-            margin-bottom: 24px;
-            display: block;
-            position: relative;
-            z-index: 5;
+        .m-icon {
+            font-size: 42px; display: block;
+            margin-bottom: 24px; position: relative; z-index: 5;
         }
-
-        .message-text {
+        .m-text {
             font-family: var(--font-accent);
-            font-size: clamp(17px, 3vw, 22px);
-            font-weight: 400;
-            line-height: 1.8;
-            color: var(--text-pearl);
-            position: relative;
-            z-index: 5;
+            font-size: clamp(16px, 2.4vw, 21px);
+            font-weight: 400; font-style: italic;
+            line-height: 1.9; color: var(--text-pearl);
+            position: relative; z-index: 5;
         }
-
-        .message-text p {
-            margin-bottom: 14px;
-        }
-
-        .message-signature {
+        .m-text p { margin-bottom: 14px; }
+        .m-sign {
             font-family: var(--font-display);
-            font-size: 20px;
-            font-style: italic;
+            font-size: 19px; font-style: italic;
             color: var(--pink-pastel);
-            margin-top: 24px;
-            position: relative;
-            z-index: 5;
+            margin-top: 24px; position: relative; z-index: 5;
         }
 
-        /* Fog Overlay */
-        .fog-overlay {
+        /*
+         * ТУМ: просто div с rgba + blur поверх контента.
+         * При каждом касании уменьшаем opacity через JS.
+         * Никакого canvas mask, никаких svg mask.
+         */
+        .fog {
             position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 6;
+            inset: 0;
             border-radius: var(--radius-lg);
-            background: radial-gradient(ellipse at center,
-                rgba(26, 10, 18, 0.85) 0%,
-                rgba(26, 10, 18, 0.95) 100%);
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-
-        .fog-hint {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 10;
-            font-family: var(--font-body);
-            font-size: 13px;
-            font-weight: 300;
-            letter-spacing: 2px;
-            color: var(--text-muted);
-            text-align: center;
-            pointer-events: none;
-            transition: opacity 0.5s;
-        }
-
-        .fog-hint span {
-            display: block;
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-
-        /* =============================================
-           SCREEN 4: FINALE
-           ============================================= */
-        .finale {
-            flex-direction: column;
-            text-align: center;
+            z-index: 8;
+            /* плавный переход opacity */
+            transition: opacity .6s ease;
+            pointer-events: auto; /* ловим касания здесь */
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
             gap: 10px;
+            /* Сам туман: blur + цвет */
+            background: rgba(20, 6, 14, 0.88);
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
         }
 
-        .finale-emoji {
-            font-size: 40px;
-            margin-bottom: 16px;
+        .fog-hint-text {
+            font-size: 13px; font-weight: 300;
+            letter-spacing: 3px; color: var(--text-muted);
+            text-align: center; pointer-events: none;
+            transition: opacity .4s;
+        }
+        .fog-hint-icon {
+            font-size: 26px; pointer-events: none;
+            animation: floatIcon 2s ease-in-out infinite;
+        }
+        @keyframes floatIcon {
+            0%,100%{ transform: translateY(0); }
+            50%    { transform: translateY(-5px); }
         }
 
-        .finale-text {
-            font-family: var(--font-display);
-            font-size: clamp(26px, 6vw, 48px);
-            font-weight: 400;
-            font-style: italic;
-            line-height: 1.4;
-            color: var(--text-pearl);
-            max-width: 550px;
-        }
-
-        .finale-text em {
-            font-weight: 700;
-            color: var(--text-white);
-            font-style: italic;
-        }
-
-        .finale-subtext {
-            font-family: var(--font-body);
-            font-size: 13px;
-            font-weight: 300;
-            letter-spacing: 2px;
-            color: var(--text-muted);
-            margin-top: 16px;
-        }
-
-        .finale-heart-btn {
-            margin-top: 40px;
-            width: 80px;
-            height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 77, 133, 0.15);
-            border: 1px solid rgba(255, 77, 133, 0.3);
+        /* Пульсирующий круг на месте касания */
+        .fog-ripple {
+            position: absolute;
+            width: 80px; height: 80px;
             border-radius: 50%;
-            font-size: 36px;
-            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            animation: heartGlow 3s ease-in-out infinite;
+            border: 2px solid rgba(255,77,133,.5);
+            pointer-events: none; z-index: 9;
+            transform: translate(-50%,-50%) scale(0);
+            opacity: 0;
+        }
+        .fog-ripple.go {
+            animation: rippleAnim .5s ease-out forwards;
+        }
+        @keyframes rippleAnim {
+            0%   { transform: translate(-50%,-50%) scale(0); opacity: 1; }
+            100% { transform: translate(-50%,-50%) scale(2.5); opacity: 0; }
+        }
+
+        /* ── FINALE ── */
+        .finale { flex-direction: column; text-align: center; }
+        .fin-emoji { font-size: 46px; margin-bottom: 18px; }
+        .fin-text {
+            font-family: var(--font-display);
+            font-size: clamp(24px, 5vw, 46px);
+            font-weight: 400; font-style: italic;
+            line-height: 1.45; color: var(--text-pearl);
+            max-width: 560px;
+        }
+        .fin-text em { font-weight: 700; color: #fff; }
+        .fin-sub {
+            font-size: 13px; font-weight: 300;
+            letter-spacing: 3px; color: var(--text-muted);
+            margin-top: 18px;
+        }
+
+        .fin-heart-btn {
+            margin-top: 48px;
+            width: 86px; height: 86px;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255,77,133,.14);
+            border: 1px solid rgba(255,77,133,.3);
+            border-radius: 50%;
+            font-size: 38px;
+            transition: all .4s ease;
+            animation: hGlow 3s ease-in-out infinite;
             position: relative;
-            /* Touch fix */
-            -webkit-touch-callout: none;
             touch-action: manipulation;
         }
-
-        .finale-heart-btn::before {
+        .fin-heart-btn::before {
             content: '';
-            position: absolute;
-            inset: -4px;
+            position: absolute; inset: -4px;
             border-radius: 50%;
-            border: 1px solid rgba(255, 77, 133, 0.15);
-            animation: heartRing 3s ease-in-out infinite;
+            border: 1px solid rgba(255,77,133,.15);
+            animation: hRing 3s ease-in-out infinite;
+        }
+        .fin-heart-btn:active { transform: scale(.9); }
+
+        @keyframes hGlow {
+            0%,100%{ box-shadow: 0 0 25px rgba(255,77,133,.2); }
+            50%    { box-shadow: 0 0 55px rgba(255,77,133,.45); }
+        }
+        @keyframes hRing {
+            0%,100%{ transform: scale(1); opacity: .5; }
+            50%    { transform: scale(1.2); opacity: 0; }
         }
 
-        @keyframes heartGlow {
-            0%, 100% { box-shadow: 0 0 25px rgba(255, 77, 133, 0.2); }
-            50% { box-shadow: 0 0 50px rgba(255, 77, 133, 0.4); }
+        .fin-hint {
+            font-size: 11px; font-weight: 300;
+            letter-spacing: 3px; text-transform: uppercase;
+            color: var(--text-muted); margin-top: 12px;
         }
 
-        @keyframes heartRing {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.15); opacity: 0; }
-        }
-
-        .finale-heart-btn:active {
-            background: rgba(255, 77, 133, 0.3);
-            transform: scale(0.95);
-        }
-
-        @media (hover: hover) {
-            .finale-heart-btn:hover {
-                background: rgba(255, 77, 133, 0.3);
-                border-color: rgba(255, 77, 133, 0.5);
-                transform: scale(1.1);
-            }
-        }
-
-        .finale-heart-hint {
-            font-size: 11px;
-            font-weight: 300;
-            letter-spacing: 2px;
-            color: var(--text-muted);
-            margin-top: 14px;
-            text-transform: uppercase;
-        }
-
-        .finale-reveal {
+        .fin-reveal {
             margin-top: 36px;
             font-family: var(--font-display);
-            font-size: clamp(22px, 5vw, 38px);
-            font-weight: 700;
-            font-style: italic;
-            color: var(--text-white);
-            opacity: 0;
-            transform: scale(0.8) translateY(20px);
-            filter: blur(10px);
-            transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            text-shadow: 0 0 30px rgba(255, 77, 133, 0.5);
+            font-size: clamp(20px, 4vw, 36px);
+            font-weight: 700; font-style: italic;
+            color: #fff; opacity: 0;
+            transform: translateY(16px) scale(.9);
+            transition: all 1s cubic-bezier(.25,.46,.45,.94);
+            text-shadow: 0 0 30px rgba(255,77,133,.5);
         }
+        .fin-reveal.show { opacity: 1; transform: none; }
 
-        .finale-reveal.show {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-            filter: blur(0);
-        }
-
-        /* =============================================
-           CONFETTI
-           ============================================= */
-        .confetti-canvas {
-            position: fixed;
-            top: 0; left: 0;
+        /* ── CONFETTI ── */
+        #confettiCanvas {
+            position: fixed; top: 0; left: 0;
             width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 99990;
+            pointer-events: none; z-index: 99990;
         }
 
-        /* =============================================
-           RESPONSIVE - iPhone specific
-           ============================================= */
-        @media (max-width: 430px) {
-            .section { 
-                padding: 60px 16px; 
-                padding-top: calc(60px + var(--sat));
-                padding-bottom: calc(60px + var(--sab));
-            }
-            .message-card { padding: 36px 20px; min-height: 350px; }
-            .carousel-card { min-width: 260px; padding: 28px 20px; }
-            .carousel-card .card-text { font-size: 18px; }
-            .carousel-card .card-number { font-size: 44px; }
-            .finale-heart-btn { width: 70px; height: 70px; font-size: 30px; }
-
-            .orb-1 { width: 200px; height: 200px; }
-            .orb-2 { width: 150px; height: 150px; }
-            .orb-3, .orb-4 { display: none; }
-            
-            .hero-date { margin-bottom: 40px; }
-            .magnetic-btn { padding: 14px 28px; font-size: 12px; }
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            .section { padding: 48px 16px; }
+            .message-card { padding: 36px 18px; }
+            .c-card { flex: 0 0 255px; }
+            .fin-heart-btn { width: 72px; height: 72px; font-size: 32px; }
+        }
+        @media (max-width: 360px) {
+            .c-card { flex: 0 0 230px; }
+            .hero-btn { padding: 14px 28px; font-size: 11px; }
         }
 
-        /* iPhone SE and small screens */
-        @media (max-width: 375px) {
-            .carousel-card { min-width: 240px; }
-            .hero-title .line-1 span { font-size: 24px; }
-            .hero-title .line-2 span { font-size: 40px; }
-        }
-
-        /* =============================================
-           REDUCED MOTION
-           ============================================= */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.2s !important;
+                animation-duration: .01ms !important;
+                transition-duration: .2s  !important;
             }
-            .orbs-container { display: none; }
         }
     </style>
 </head>
 <body>
 
-<!-- CUSTOM CURSOR (Desktop only) -->
-<div class="cursor-dot" id="cursorDot"></div>
-<div class="cursor-ring" id="cursorRing"></div>
-<div class="cursor-glow" id="cursorGlow"></div>
+<!-- CURSOR -->
+<div class="cursor-dot"  id="cDot"></div>
+<div class="cursor-ring" id="cRing"></div>
 
-<!-- CONFETTI CANVAS -->
-<canvas class="confetti-canvas" id="confettiCanvas"></canvas>
+<!-- CONFETTI -->
+<canvas id="confettiCanvas"></canvas>
 
-<!-- WEBGL FLUID BACKGROUND -->
+<!-- BG -->
 <canvas id="fluid-canvas"></canvas>
+<div class="bg-fallback" id="bgFallback"></div>
 
-<!-- LIGHT ORBS -->
+<!-- ORBS -->
 <div class="orbs-container">
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-    <div class="orb orb-4"></div>
 </div>
 
 <!-- PRELOADER -->
 <div class="preloader" id="preloader">
-    <div class="preloader-heart-glow" id="preloaderGlow"></div>
-    <div class="preloader-heart-container">
+    <div class="preloader-glow"  id="pGlow"></div>
+    <div class="preloader-heart-wrap">
         <div class="preloader-heart">
-            <svg viewBox="0 0 100 100">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                 <defs>
-                    <linearGradient id="preloaderHeartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#FF4D85"/>
-                        <stop offset="50%" stop-color="#FFB6D5"/>
-                        <stop offset="100%" stop-color="#E0C3FC"/>
-                    </linearGradient>
-                    <linearGradient id="preloaderHeartFillGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#FF4D85"/>
+                    <linearGradient id="hGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%"   stop-color="#FF4D85"/>
+                        <stop offset="50%"  stop-color="#FFB6D5"/>
                         <stop offset="100%" stop-color="#E0C3FC"/>
                     </linearGradient>
                 </defs>
-                <path d="M50 88 C25 65, 2 45, 2 28 C2 14, 13 3, 27 3 C35 3, 43 8, 50 18 C57 8, 65 3, 73 3 C87 3, 98 14, 98 28 C98 45, 75 65, 50 88Z"/>
+                <path d="M50 88C25 65,2 45,2 28C2 14,13 3,27 3C35 3,43 8,50 18C57 8,65 3,73 3C87 3,98 14,98 28C98 45,75 65,50 88Z"/>
             </svg>
         </div>
-        <div class="preloader-heart-fill">
-            <svg viewBox="0 0 100 100">
+        <div class="preloader-heart-fill" id="pFill">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                 <defs>
-                    <linearGradient id="preloaderHeartFillGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#FF4D85"/>
+                    <linearGradient id="hFillGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%"   stop-color="#FF4D85"/>
                         <stop offset="100%" stop-color="#E0C3FC"/>
                     </linearGradient>
                 </defs>
-                <path d="M50 88 C25 65, 2 45, 2 28 C2 14, 13 3, 27 3 C35 3, 43 8, 50 18 C57 8, 65 3, 73 3 C87 3, 98 14, 98 28 C98 45, 75 65, 50 88Z"
-                      fill="url(#preloaderHeartFillGrad2)"/>
+                <path d="M50 88C25 65,2 45,2 28C2 14,13 3,27 3C35 3,43 8,50 18C57 8,65 3,73 3C87 3,98 14,98 28C98 45,75 65,50 88Z"
+                      fill="url(#hFillGrad)"/>
             </svg>
         </div>
     </div>
-    <p class="preloader-text" id="preloaderText">создаю для тебя...</p>
-    <div class="preloader-particles" id="preloaderParticles"></div>
+    <p class="preloader-text" id="pText">создаю для тебя...</p>
+    <div class="preloader-particles" id="pParticles"></div>
 </div>
 
-<!-- ========= MAIN CONTENT ========= -->
+<!-- CONTENT -->
 <div class="content" id="content">
 
-    <!-- SCREEN 1: HERO -->
+    <!-- HERO -->
     <section class="section hero" id="heroSection">
-        <div class="hero-label">
-            <span>С днём весны и красоты</span>
-        </div>
-
+        <p class="hero-label">С днём весны и красоты</p>
         <h1 class="hero-title">
             <span class="line line-1"><span>Для самой прекрасной</span></span>
             <span class="line line-2"><span>Арины</span></span>
         </h1>
-
-        <p class="hero-date"><span>8 марта 2025</span></p>
-
-        <div class="magnetic-btn-wrapper" id="magneticWrapper">
-            <button class="magnetic-btn" id="magneticBtn" onclick="scrollToSection('#complimentsSection')">
-                Коснись меня
-                <span class="btn-arrow">↓</span>
-            </button>
-        </div>
-
-        <div class="scroll-indicator" id="scrollIndicator">
+        <p class="hero-date">8 марта 2025</p>
+        <button class="hero-btn" id="heroBtn">
+            Коснись меня <span id="btnArrow">↓</span>
+        </button>
+        <div class="scroll-ind" id="scrollInd">
             <div class="scroll-line"></div>
         </div>
     </section>
 
-    <!-- SCREEN 2: COMPLIMENTS -->
-    <section class="section compliments" id="complimentsSection">
+    <!-- COMPLIMENTS -->
+    <section class="section compliments-section" id="complimentsSection">
         <div class="section-inner">
             <div class="compliments-header">
-                <p class="compliments-label">Почему ты особенная</p>
-                <h2 class="compliments-title">Слова для тебя</h2>
+                <p class="c-label">Почему ты особенная</p>
+                <h2 class="c-title">Слова для тебя</h2>
             </div>
 
-            <div class="carousel" id="carousel">
-                <div class="carousel-card glass">
-                    <div class="glass-highlight"></div>
-                    <span class="card-number">01</span>
-                    <p class="card-text">Ты освещаешь всё вокруг одной только улыбкой. Рядом с тобой мир становится теплее.</p>
-                    <span class="card-emoji">✨</span>
+            <!--
+                КАРУСЕЛЬ:
+                touch-action: pan-x  →  только горизонталь,
+                вертикальный скролл страницы НЕ блокируется
+            -->
+            <div class="carousel-track" id="carouselTrack">
+                <div class="c-card glass">
+                    <div class="glass-shine"></div>
+                    <span class="c-num">01</span>
+                    <p class="c-text">Ты освещаешь всё вокруг одной только улыбкой. Рядом с тобой мир становится теплее.</p>
+                    <span class="c-emoji">✨</span>
                 </div>
-                <div class="carousel-card glass">
-                    <div class="glass-highlight"></div>
-                    <span class="card-number">02</span>
-                    <p class="card-text">В тебе столько нежности и силы одновременно. Это вдохновляет и восхищает.</p>
-                    <span class="card-emoji">🌸</span>
+                <div class="c-card glass">
+                    <div class="glass-shine"></div>
+                    <span class="c-num">02</span>
+                    <p class="c-text">В тебе столько нежности и силы одновременно. Это вдохновляет и восхищает.</p>
+                    <span class="c-emoji">🌸</span>
                 </div>
-                <div class="carousel-card glass">
-                    <div class="glass-highlight"></div>
-                    <span class="card-number">03</span>
-                    <p class="card-text">Твой смех — лучшая мелодия. Он заставляет забыть обо всём на свете.</p>
-                    <span class="card-emoji">🎵</span>
+                <div class="c-card glass">
+                    <div class="glass-shine"></div>
+                    <span class="c-num">03</span>
+                    <p class="c-text">Твой смех — лучшая мелодия. Он заставляет забыть обо всём на свете.</p>
+                    <span class="c-emoji">🎵</span>
                 </div>
-                <div class="carousel-card glass">
-                    <div class="glass-highlight"></div>
-                    <span class="card-number">04</span>
-                    <p class="card-text">Ты умеешь находить красоту в мелочах и превращать обычные моменты в волшебные.</p>
-                    <span class="card-emoji">🦋</span>
+                <div class="c-card glass">
+                    <div class="glass-shine"></div>
+                    <span class="c-num">04</span>
+                    <p class="c-text">Ты умеешь находить красоту в мелочах и превращать обычные моменты в волшебные.</p>
+                    <span class="c-emoji">🦋</span>
                 </div>
-                <div class="carousel-card glass">
-                    <div class="glass-highlight"></div>
-                    <span class="card-number">05</span>
-                    <p class="card-text">С тобой каждый день — как маленький праздник. Ты и есть весна.</p>
-                    <span class="card-emoji">🌷</span>
+                <div class="c-card glass">
+                    <div class="glass-shine"></div>
+                    <span class="c-num">05</span>
+                    <p class="c-text">С тобой каждый день — как маленький праздник. Ты и есть весна.</p>
+                    <span class="c-emoji">🌷</span>
                 </div>
             </div>
 
             <div class="carousel-dots" id="carouselDots">
-                <div class="carousel-dot active" data-index="0"></div>
-                <div class="carousel-dot" data-index="1"></div>
-                <div class="carousel-dot" data-index="2"></div>
-                <div class="carousel-dot" data-index="3"></div>
-                <div class="carousel-dot" data-index="4"></div>
+                <div class="c-dot active" data-i="0"></div>
+                <div class="c-dot" data-i="1"></div>
+                <div class="c-dot" data-i="2"></div>
+                <div class="c-dot" data-i="3"></div>
+                <div class="c-dot" data-i="4"></div>
             </div>
         </div>
     </section>
 
-    <!-- SCREEN 3: MESSAGE -->
+    <!-- MESSAGE -->
     <section class="section message-section" id="messageSection">
-        <p class="message-label">Главное послание</p>
+        <p class="m-label">Главное послание</p>
 
         <div class="message-card glass" id="messageCard">
-            <div class="glass-highlight"></div>
-            <span class="message-envelope-icon">💌</span>
+            <div class="glass-shine"></div>
 
-            <div class="message-text">
+            <span class="m-icon">💌</span>
+            <div class="m-text">
                 <p>Дорогая Арина,</p>
                 <p>В этот весенний день хочу сказать тебе то, что порой забываешь услышать в суете дней: ты — невероятная. Не просто красивая, не просто умная, а по-настоящему особенная.</p>
                 <p>Ты наполняешь собой пространство так, что оно начинает дышать. Рядом с тобой расцветает всё — от мыслей до мечтаний.</p>
-                <p>Пусть этот день станет началом самой прекрасной весны в твоей жизни. 🌸</p>
+                <p>Пусть этот день станет началом самой прекрасной весны в твоей жизни. Ты заслуживаешь каждого луча солнца, каждого тёплого слова и каждого исполненного желания. 🌸</p>
             </div>
+            <p class="m-sign">С бесконечной нежностью ❤️</p>
 
-            <p class="message-signature">С бесконечной нежностью ❤️</p>
-
-            <div class="fog-overlay" id="fogOverlay"></div>
-            <div class="fog-hint" id="fogHint">
-                <span>👆</span>
-                Проведи по стеклу,<br>чтобы прочитать
+            <!-- ТУМ (простой div, без canvas/svg mask) -->
+            <div class="fog" id="fog">
+                <div class="fog-ripple" id="fogRipple"></div>
+                <span class="fog-hint-icon">👆</span>
+                <p class="fog-hint-text" id="fogHintText">Коснись, чтобы прочитать</p>
             </div>
         </div>
     </section>
 
-    <!-- SCREEN 4: FINALE -->
+    <!-- FINALE -->
     <section class="section finale" id="finaleSection">
-        <p class="finale-emoji">🌙</p>
-        <p class="finale-text">
-            <em>Улыбнись.</em><br>
-            Тебе очень идёт.
-        </p>
-        <p class="finale-subtext">Арина, ты — лучшее, что есть</p>
+        <p class="fin-emoji">🌙</p>
+        <p class="fin-text"><em>Улыбнись.</em><br>Тебе очень идёт.</p>
+        <p class="fin-sub">Арина, ты — лучшее, что есть</p>
 
-        <button class="finale-heart-btn" id="finaleHeartBtn" onclick="triggerFinale()">
+        <button class="fin-heart-btn" id="finBtn" aria-label="Нажми для поздравления">
             💖
         </button>
-        <p class="finale-heart-hint">нажми</p>
-
-        <p class="finale-reveal" id="finaleReveal">
-            С 8 Марта, любимая Арина! 🌸
-        </p>
+        <p class="fin-hint">нажми</p>
+        <p class="fin-reveal" id="finReveal">С 8 Марта, любимая Арина! 🌸</p>
     </section>
 
-</div>
+</div><!-- /content -->
 
-<!-- ========================================
-     JAVASCRIPT
-     ======================================== -->
+
 <script>
-    // =============================================
-    // iOS VIEWPORT HEIGHT FIX
-    // =============================================
-    function setVH() {
-        const vh = window.innerHeight * 0.01;
-        document.documentElement.style.setProperty('--vh', `${vh}px`);
+// ── утилиты ──────────────────────────────────────
+const isTouch = ('ontouchstart' in window) || window.matchMedia('(hover:none)').matches;
+
+gsap.registerPlugin(ScrollTrigger);
+ScrollTrigger.config({ ignoreMobileResize: true });
+
+// ── WebGL background ─────────────────────────────
+(function() {
+    const canvas = document.getElementById('fluid-canvas');
+    let gl = null;
+    try {
+        gl = canvas.getContext('webgl', { antialias:false, alpha:false })
+             || canvas.getContext('experimental-webgl', { antialias:false, alpha:false });
+    } catch(e) {}
+
+    if (!gl) {
+        canvas.style.display = 'none';
+        document.getElementById('bgFallback').style.display = 'block';
+        return;
     }
-    setVH();
-    window.addEventListener('resize', setVH);
-    window.addEventListener('orientationchange', () => {
-        setTimeout(setVH, 100);
+
+    let W, H, mx=.5, my=.5, t=0, raf;
+
+    function resize() {
+        W = canvas.width  = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+        gl.viewport(0,0,W,H);
+    }
+    resize();
+    let rTimer;
+    window.addEventListener('resize', ()=>{ clearTimeout(rTimer); rTimer=setTimeout(resize,100); });
+
+    const vSrc = `attribute vec2 p; void main(){ gl_Position=vec4(p,0,1); }`;
+    const fSrc = `
+        precision mediump float;
+        uniform float u_t; uniform vec2 u_r, u_m;
+        vec3 pal(float t){
+            vec3 a=vec3(.15,.04,.08),b=vec3(.6,.15,.3),c=vec3(.4,.2,.5),d=vec3(.15,.1,.2);
+            return a+b*cos(6.283*(c*t+d));
+        }
+        void main(){
+            vec2 uv=gl_FragCoord.xy/u_r;
+            float d=length(uv-u_m);
+            float w1=sin(uv.x*4.+u_t*.4+d*3.)*.5+.5;
+            float w2=sin(uv.y*3.-u_t*.3+d*2.)*.5+.5;
+            float w3=sin((uv.x+uv.y)*2.5+u_t*.2)*.5+.5;
+            float pat=w1*.4+w2*.35+w3*.25;
+            float mg=smoothstep(.4,.0,d)*.3;
+            vec3 col=pal(pat+u_t*.05)+mg*vec3(.8,.2,.4);
+            float vig=1.-smoothstep(.3,1.2,length(uv-.5)*1.4);
+            gl_FragColor=vec4(col*vig*1.1,1);
+        }
+    `;
+
+    function mkShader(type, src) {
+        const s=gl.createShader(type);
+        gl.shaderSource(s,src); gl.compileShader(s);
+        if (!gl.getShaderParameter(s,gl.COMPILE_STATUS)){ gl.deleteShader(s); return null; }
+        return s;
+    }
+    const vs=mkShader(gl.VERTEX_SHADER,vSrc);
+    const fs=mkShader(gl.FRAGMENT_SHADER,fSrc);
+    if(!vs||!fs){ canvas.style.display='none'; document.getElementById('bgFallback').style.display='block'; return; }
+
+    const prog=gl.createProgram();
+    gl.attachShader(prog,vs); gl.attachShader(prog,fs); gl.linkProgram(prog);
+    if(!gl.getProgramParameter(prog,gl.LINK_STATUS)){ canvas.style.display='none'; document.getElementById('bgFallback').style.display='block'; return; }
+    gl.useProgram(prog);
+
+    const buf=gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+    gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+    const pLoc=gl.getAttribLocation(prog,'p');
+    gl.enableVertexAttribArray(pLoc);
+    gl.vertexAttribPointer(pLoc,2,gl.FLOAT,false,0,0);
+
+    const uT=gl.getUniformLocation(prog,'u_t');
+    const uR=gl.getUniformLocation(prog,'u_r');
+    const uM=gl.getUniformLocation(prog,'u_m');
+
+    document.addEventListener('mousemove',e=>{ mx=e.clientX/W; my=1-e.clientY/H; });
+    document.addEventListener('touchmove',e=>{ if(e.touches[0]){ mx=e.touches[0].clientX/W; my=1-e.touches[0].clientY/H; } },{passive:true});
+
+    const fps = isTouch ? 30 : 60;
+    const fi  = 1000/fps;
+    let last=0;
+
+    function render(now){
+        raf=requestAnimationFrame(render);
+        if(now-last<fi) return;
+        last=now; t+=.016;
+        gl.uniform1f(uT,t); gl.uniform2f(uR,W,H); gl.uniform2f(uM,mx,my);
+        gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+    }
+    requestAnimationFrame(render);
+    document.addEventListener('visibilitychange',()=>{ if(document.hidden) cancelAnimationFrame(raf); else requestAnimationFrame(render); });
+})();
+
+// ── Cursor (desktop) ─────────────────────────────
+(function(){
+    if(isTouch) return;
+    const dot=document.getElementById('cDot'), ring=document.getElementById('cRing');
+    if(!dot||!ring) return;
+    let mx=0,my=0,cx=0,cy=0;
+    document.addEventListener('mousemove',e=>{ mx=e.clientX; my=e.clientY; dot.style.left=mx+'px'; dot.style.top=my+'px'; });
+    (function loop(){ cx+=(mx-cx)*.15; cy+=(my-cy)*.15; ring.style.left=cx+'px'; ring.style.top=cy+'px'; requestAnimationFrame(loop); })();
+    document.querySelectorAll('button,.glass').forEach(el=>{
+        el.addEventListener('mouseenter',()=>{ ring.style.width=ring.style.height='58px'; ring.style.borderColor='rgba(255,77,133,.6)'; });
+        el.addEventListener('mouseleave',()=>{ ring.style.width=ring.style.height='40px'; ring.style.borderColor='rgba(255,255,255,.5)'; });
     });
+})();
 
-    // =============================================
-    // GSAP REGISTER
-    // =============================================
-    gsap.registerPlugin(ScrollTrigger);
+// ── Preloader ─────────────────────────────────────
+(function(){
+    const pl=document.getElementById('preloader');
+    const hp=pl.querySelector('.preloader-heart path');
+    const hf=document.getElementById('pFill');
+    const gw=document.getElementById('pGlow');
+    const pt=document.getElementById('pText');
 
-    // =============================================
-    // DETECT TOUCH DEVICE
-    // =============================================
-    const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    const tl=gsap.timeline({ onComplete(){
+        // burst
+        const cont=document.getElementById('pParticles');
+        const cols=['#FF4D85','#FFB6D5','#E0C3FC','#FAD0C4'];
+        const cx=innerWidth/2, cy=innerHeight/2;
+        for(let i=0;i<28;i++){
+            const p=document.createElement('div');
+            p.className='pp';
+            const sz=Math.random()*7+3;
+            p.style.cssText=`width:${sz}px;height:${sz}px;background:${cols[i%4]};left:${cx}px;top:${cy}px;`;
+            cont.appendChild(p);
+            const ang=(Math.PI*2*i/28)+(Math.random()-.5)*.5;
+            const dist=70+Math.random()*200;
+            gsap.to(p,{ x:Math.cos(ang)*dist, y:Math.sin(ang)*dist, opacity:0, scale:0, duration:.7+Math.random()*.3, ease:'power2.out', delay:Math.random()*.1 });
+        }
+        gsap.to(pl,{ opacity:0, duration:.9, delay:.5, ease:'power2.inOut', onComplete(){ pl.style.display='none'; animHero(); } });
+    }});
 
-    // =============================================
-    // WEBGL FLUID BACKGROUND
-    // =============================================
-    (function initFluid() {
-        const canvas = document.getElementById('fluid-canvas');
-        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    tl.to(hp,  { strokeDashoffset:0, duration:2, ease:'power2.inOut' })
+      .to(pt,  { opacity:1, duration:.5 }, .5)
+      .to(gw,  { opacity:.6, duration:1.5, ease:'power2.out' }, .5)
+      .to(hf,  { opacity:1, duration:.7, ease:'power2.out' }, 1.5)
+      .to(gw,  { scale:2, opacity:0, duration:.7, ease:'power2.out' }, 2.2);
+})();
 
-        if (!gl) {
-            canvas.style.background = 'linear-gradient(135deg, #1a0a12 0%, #2a0a1a 30%, #1a0a20 60%, #0d0509 100%)';
-            return;
+// ── Hero animation ────────────────────────────────
+function animHero(){
+    gsap.timeline({ defaults:{ ease:'power3.out' } })
+      .fromTo('.hero-label',   { y:20,opacity:0 },{ y:0,opacity:1,duration:.8 })
+      .to('.line-1 span',      { y:0, duration:1,   ease:'power4.out' }, .3)
+      .to('.line-2 span',      { y:0, duration:1.2, ease:'power4.out' }, .5)
+      .fromTo('.hero-date',    { y:14,opacity:0 },{ y:0,opacity:1,duration:.8 }, .8)
+      .fromTo('.hero-btn',     { y:28,opacity:0,scale:.9 },{ y:0,opacity:1,scale:1,duration:.8 }, 1)
+      .to('#scrollInd',        { opacity:.5, duration:.6 }, 1.5);
+}
+
+// ── Hero button scroll ────────────────────────────
+document.getElementById('heroBtn').addEventListener('click', ()=>{
+    document.getElementById('complimentsSection').scrollIntoView({ behavior:'smooth', block:'start' });
+});
+
+// ── Carousel ─────────────────────────────────────
+const track = document.getElementById('carouselTrack');
+const dots  = document.querySelectorAll('.c-dot');
+const ccards = document.querySelectorAll('.c-card');
+
+// Синхронизация точек при скролле карусели
+track.addEventListener('scroll', ()=>{
+    if(!ccards.length) return;
+    // gap = 18px
+    const cw  = ccards[0].offsetWidth + 18;
+    const idx = Math.min(Math.round(track.scrollLeft / cw), dots.length-1);
+    dots.forEach((d,i)=> d.classList.toggle('active', i===idx));
+}, { passive:true });
+
+// Клик по точкам
+dots.forEach(dot => {
+    dot.addEventListener('click', ()=>{
+        const idx = parseInt(dot.dataset.i);
+        const cw  = ccards[0].offsetWidth + 18;
+        track.scrollTo({ left: idx*cw, behavior:'smooth' });
+    });
+});
+
+// ScrollTrigger для карусели
+gsap.from('.c-label', {
+    scrollTrigger:{ trigger:'#complimentsSection', start:'top 82%' },
+    y:30, opacity:0, duration:.8
+});
+gsap.from('.c-title', {
+    scrollTrigger:{ trigger:'#complimentsSection', start:'top 78%' },
+    y:40, opacity:0, duration:1, delay:.15
+});
+gsap.from('.c-card', {
+    scrollTrigger:{ trigger:'#carouselTrack', start:'top 88%' },
+    y:55, opacity:0, scale:.95, duration:.75, stagger:.1, ease:'power3.out'
+});
+
+// ── Fog effect ────────────────────────────────────
+/*
+ * Вместо canvas mask / svg mask (глючат на Safari iOS):
+ * Просто уменьшаем opacity тумана при каждом касании/движении.
+ * Используем счётчик «энергии» — много касаний = полностью открыто.
+ */
+(function(){
+    const card    = document.getElementById('messageCard');
+    const fog     = document.getElementById('fog');
+    const hint    = document.getElementById('fogHintText');
+    const ripple  = document.getElementById('fogRipple');
+    if(!fog) return;
+
+    let energy   = 0;          // накапливается при касаниях
+    const MAX    = 30;         // сколько «касаний» нужно для полного открытия
+    let revealed = false;
+    let hintHidden = false;
+
+    function showRipple(x, y) {
+        const rect = card.getBoundingClientRect();
+        ripple.style.left = (x - rect.left) + 'px';
+        ripple.style.top  = (y - rect.top)  + 'px';
+        ripple.classList.remove('go');
+        // force reflow
+        void ripple.offsetWidth;
+        ripple.classList.add('go');
+    }
+
+    function addEnergy(x, y) {
+        if (revealed) return;
+        energy = Math.min(energy + 1, MAX);
+
+        showRipple(x, y);
+
+        // opacity тумана: от 1 до 0
+        const progress = energy / MAX;
+        fog.style.opacity = String(1 - progress);
+
+        if (energy >= 5 && !hintHidden) {
+            hintHidden = true;
+            gsap.to(hint, { opacity:0, duration:.4 });
         }
 
-        let width, height, mouseX = 0.5, mouseY = 0.5, time = 0;
-
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-            gl.viewport(0, 0, width, height);
-        }
-        resize();
-        window.addEventListener('resize', resize);
-
-        const vertSrc = `
-            attribute vec2 position;
-            void main() {
-                gl_Position = vec4(position, 0.0, 1.0);
-            }
-        `;
-
-        const fragSrc = `
-            precision mediump float;
-            uniform float u_time;
-            uniform vec2 u_resolution;
-            uniform vec2 u_mouse;
-
-            vec3 palette(float t) {
-                vec3 a = vec3(0.15, 0.04, 0.08);
-                vec3 b = vec3(0.6, 0.15, 0.3);
-                vec3 c = vec3(0.4, 0.2, 0.5);
-                vec3 d = vec3(0.15, 0.1, 0.2);
-                return a + b * cos(6.28318 * (c * t + d));
-            }
-
-            void main() {
-                vec2 uv = gl_FragCoord.xy / u_resolution;
-                vec2 mouse = u_mouse;
-
-                float dist = length(uv - mouse);
-                float wave1 = sin(uv.x * 4.0 + u_time * 0.4 + dist * 3.0) * 0.5 + 0.5;
-                float wave2 = sin(uv.y * 3.0 - u_time * 0.3 + dist * 2.0) * 0.5 + 0.5;
-                float wave3 = sin((uv.x + uv.y) * 2.5 + u_time * 0.2) * 0.5 + 0.5;
-
-                float pattern = wave1 * 0.4 + wave2 * 0.35 + wave3 * 0.25;
-                float mouseGlow = smoothstep(0.4, 0.0, dist) * 0.3;
-
-                vec3 color = palette(pattern + u_time * 0.05);
-                color += mouseGlow * vec3(0.8, 0.2, 0.4);
-
-                float vignette = 1.0 - smoothstep(0.3, 1.2, length(uv - 0.5) * 1.4);
-                color *= vignette * 1.1;
-
-                gl_FragColor = vec4(color, 1.0);
-            }
-        `;
-
-        function createShader(type, src) {
-            const s = gl.createShader(type);
-            gl.shaderSource(s, src);
-            gl.compileShader(s);
-            if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-                gl.deleteShader(s);
-                return null;
-            }
-            return s;
-        }
-
-        const vs = createShader(gl.VERTEX_SHADER, vertSrc);
-        const fs = createShader(gl.FRAGMENT_SHADER, fragSrc);
-
-        if (!vs || !fs) {
-            canvas.style.background = 'linear-gradient(135deg, #1a0a12, #2a0a1a)';
-            return;
-        }
-
-        const program = gl.createProgram();
-        gl.attachShader(program, vs);
-        gl.attachShader(program, fs);
-        gl.linkProgram(program);
-        gl.useProgram(program);
-
-        const verts = new Float32Array([-1,-1, 1,-1, -1,1, 1,1]);
-        const buf = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-        gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
-
-        const posLoc = gl.getAttribLocation(program, 'position');
-        gl.enableVertexAttribArray(posLoc);
-        gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
-
-        const uTime = gl.getUniformLocation(program, 'u_time');
-        const uRes = gl.getUniformLocation(program, 'u_resolution');
-        const uMouse = gl.getUniformLocation(program, 'u_mouse');
-
-        if (!isTouchDevice) {
-            document.addEventListener('mousemove', e => {
-                mouseX = e.clientX / width;
-                mouseY = 1.0 - e.clientY / height;
+        if (energy >= MAX) {
+            revealed = true;
+            gsap.to(fog, {
+                opacity: 0, duration: 1.2, ease:'power2.out',
+                onComplete: ()=>{ fog.style.display='none'; }
             });
         }
+    }
 
-        document.addEventListener('touchmove', e => {
-            if (e.touches[0]) {
-                mouseX = e.touches[0].clientX / width;
-                mouseY = 1.0 - e.touches[0].clientY / height;
-            }
-        }, { passive: true });
-
-        function render() {
-            time += 0.016;
-            gl.uniform1f(uTime, time);
-            gl.uniform2f(uRes, width, height);
-            gl.uniform2f(uMouse, mouseX, mouseY);
-            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-            requestAnimationFrame(render);
-        }
-        render();
-    })();
-
-    // =============================================
-    // CUSTOM CURSOR (Desktop only)
-    // =============================================
-    (function initCursor() {
-        if (isTouchDevice) return;
-
-        const dot = document.getElementById('cursorDot');
-        const ring = document.getElementById('cursorRing');
-        const glow = document.getElementById('cursorGlow');
-
-        if (!dot || !ring) return;
-
-        let mx = window.innerWidth / 2, my = window.innerHeight / 2;
-        let cx = mx, cy = my;
-
-        document.addEventListener('mousemove', e => {
-            mx = e.clientX;
-            my = e.clientY;
-            dot.style.left = mx + 'px';
-            dot.style.top = my + 'px';
-            if (glow) {
-                glow.style.left = mx + 'px';
-                glow.style.top = my + 'px';
-            }
-        });
-
-        function animateCursor() {
-            cx += (mx - cx) * 0.15;
-            cy += (my - cy) * 0.15;
-            ring.style.left = cx + 'px';
-            ring.style.top = cy + 'px';
-            requestAnimationFrame(animateCursor);
-        }
-        animateCursor();
-
-        document.querySelectorAll('button, .glass, a, .carousel-dot').forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                ring.style.width = '60px';
-                ring.style.height = '60px';
-                ring.style.borderColor = 'rgba(255, 77, 133, 0.6)';
-            });
-            el.addEventListener('mouseleave', () => {
-                ring.style.width = '40px';
-                ring.style.height = '40px';
-                ring.style.borderColor = 'rgba(255, 255, 255, 0.5)';
-            });
-        });
-    })();
-
-    // =============================================
-    // GLASS CARD MOUSE FOLLOW (Desktop only)
-    // =============================================
-    if (!isTouchDevice) {
-        document.querySelectorAll('.glass').forEach(card => {
-            card.addEventListener('mousemove', e => {
-                const rect = card.getBoundingClientRect();
-                const x = ((e.clientX - rect.left) / rect.width) * 100;
-                const y = ((e.clientY - rect.top) / rect.height) * 100;
-                card.style.setProperty('--mouse-x', x + '%');
-                card.style.setProperty('--mouse-y', y + '%');
-            });
-        });
-
-        document.querySelectorAll('.glass').forEach(card => {
-            const highlight = card.querySelector('.glass-highlight');
-            if (!highlight) return;
-            card.addEventListener('mouseenter', () => {
-                gsap.fromTo(highlight, { left: '-100%' }, { left: '200%', duration: 0.8, ease: 'power2.out' });
-            });
+    // Mouse
+    if (!isTouch) {
+        card.addEventListener('mousemove', e => {
+            addEnergy(e.clientX, e.clientY);
         });
     }
 
-    // =============================================
-    // PRELOADER
-    // =============================================
-    (function initPreloader() {
-        const preloader = document.getElementById('preloader');
-        const heartPath = preloader.querySelector('.preloader-heart path');
-        const heartFill = preloader.querySelector('.preloader-heart-fill');
-        const heartGlow = document.getElementById('preloaderGlow');
-        const preloaderText = document.getElementById('preloaderText');
+    // Touch — важно: passive:false чтобы не конфликтовать со скроллом страницы
+    // НО мы используем touch-action:none на .message-card,
+    // поэтому браузер уже знает что scroll здесь отключён
+    card.addEventListener('touchstart', e => {
+        if(e.touches[0]) addEnergy(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive:true });
 
-        const tl = gsap.timeline({
-            onComplete: () => {
-                createPreloaderBurst();
-                gsap.to(preloader, {
-                    opacity: 0,
-                    duration: 1,
-                    delay: 0.5,
-                    ease: 'power2.inOut',
-                    onComplete: () => {
-                        preloader.classList.add('done');
-                        preloader.style.display = 'none';
-                        animateHero();
-                    }
-                });
-            }
-        });
+    card.addEventListener('touchmove', e => {
+        if(e.touches[0]) addEnergy(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive:true });
 
-        tl.to(heartPath, { strokeDashoffset: 0, duration: 1.8, ease: 'power2.inOut' })
-          .to(preloaderText, { opacity: 1, duration: 0.5 }, 0.5)
-          .to(heartGlow, { opacity: 0.6, duration: 1.2 }, 0.5)
-          .to(heartFill, { opacity: 1, duration: 0.6 }, 1.3)
-          .to(heartGlow, { scale: 1.8, opacity: 0, duration: 0.6 }, 1.8);
+    // GSAP reveal
+    gsap.from('.m-label', {
+        scrollTrigger:{ trigger:'#messageSection', start:'top 82%' },
+        y:20, opacity:0, duration:.8
+    });
+    gsap.from('#messageCard', {
+        scrollTrigger:{ trigger:'#messageSection', start:'top 72%' },
+        y:55, opacity:0, scale:.95, duration:1, ease:'power3.out'
+    });
+})();
 
-        function createPreloaderBurst() {
-            const container = document.getElementById('preloaderParticles');
-            const colors = ['#FF4D85', '#FFB6D5', '#E0C3FC', '#FAD0C4'];
-            const cx = window.innerWidth / 2;
-            const cy = window.innerHeight / 2;
+// ── Finale ───────────────────────────────────────
+gsap.from('.fin-emoji',    { scrollTrigger:{ trigger:'#finaleSection', start:'top 72%' }, y:28,opacity:0,scale:.5,duration:.8,ease:'back.out(2)' });
+gsap.from('.fin-text',     { scrollTrigger:{ trigger:'#finaleSection', start:'top 68%' }, y:38,opacity:0,duration:1,delay:.2 });
+gsap.from('.fin-sub',      { scrollTrigger:{ trigger:'#finaleSection', start:'top 64%' }, y:18,opacity:0,duration:.8,delay:.4 });
+gsap.from('.fin-heart-btn',{ scrollTrigger:{ trigger:'#finaleSection', start:'top 60%' }, scale:0,opacity:0,duration:.8,delay:.6,ease:'back.out(2)' });
+gsap.from('.fin-hint',     { scrollTrigger:{ trigger:'#finaleSection', start:'top 60%' }, y:8,opacity:0,duration:.6,delay:1 });
 
-            for (let i = 0; i < 30; i++) {
-                const p = document.createElement('div');
-                p.className = 'preloader-particle';
-                const size = Math.random() * 6 + 3;
-                p.style.width = size + 'px';
-                p.style.height = size + 'px';
-                p.style.background = colors[Math.floor(Math.random() * colors.length)];
-                p.style.left = cx + 'px';
-                p.style.top = cy + 'px';
-                container.appendChild(p);
+// ── Confetti ──────────────────────────────────────
+const cc  = document.getElementById('confettiCanvas');
+const ctx = cc.getContext('2d');
+let pieces=[], anim=false;
 
-                const angle = (Math.PI * 2 * i) / 30;
-                const dist = 80 + Math.random() * 200;
+function resizeCC(){ cc.width=innerWidth; cc.height=innerHeight; }
+resizeCC();
+window.addEventListener('resize', resizeCC);
 
-                gsap.to(p, {
-                    x: Math.cos(angle) * dist,
-                    y: Math.sin(angle) * dist,
-                    opacity: 0,
-                    scale: 0,
-                    duration: 0.8 + Math.random() * 0.4,
-                    ease: 'power2.out',
-                    delay: Math.random() * 0.15
-                });
-            }
-        }
-    })();
-
-    // =============================================
-    // HERO ANIMATIONS
-    // =============================================
-    function animateHero() {
-        const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-
-        tl.to('.hero-label span', { y: 0, opacity: 1, duration: 0.7, from: { y: 20, opacity: 0 } })
-          .to('.hero-title .line-1 span', { y: 0, duration: 0.9, ease: 'power4.out' }, 0.2)
-          .to('.hero-title .line-2 span', { y: 0, duration: 1, ease: 'power4.out' }, 0.4)
-          .to('.hero-date span', { y: 0, opacity: 1, duration: 0.7, from: { y: 15, opacity: 0 } }, 0.6)
-          .fromTo('.magnetic-btn', { y: 25, opacity: 0, scale: 0.95 }, { y: 0, opacity: 1, scale: 1, duration: 0.7 }, 0.8)
-          .to('#scrollIndicator', { opacity: 0.5, duration: 0.5 }, 1.2);
+class Piece {
+    constructor(){
+        this.x  = Math.random()*cc.width;
+        this.y  = -10-Math.random()*80;
+        this.w  = Math.random()*9+4;
+        this.h  = Math.random()*5+3;
+        this.vx = (Math.random()-.5)*5;
+        this.vy = Math.random()*3+2;
+        this.rot= Math.random()*360;
+        this.rs = (Math.random()-.5)*9;
+        this.op = 1;
+        this.col= ['#FF4D85','#FFB6D5','#E0C3FC','#FAD0C4','#FF6B9D','#FFD700'][Math.floor(Math.random()*6)];
+        this.circ= Math.random()>.4;
     }
-
-    // =============================================
-    // MAGNETIC BUTTON (Desktop only)
-    // =============================================
-    if (!isTouchDevice) {
-        (function initMagneticBtn() {
-            const wrapper = document.getElementById('magneticWrapper');
-            const btn = document.getElementById('magneticBtn');
-            if (!wrapper || !btn) return;
-
-            wrapper.addEventListener('mousemove', e => {
-                const rect = wrapper.getBoundingClientRect();
-                const x = e.clientX - rect.left - rect.width / 2;
-                const y = e.clientY - rect.top - rect.height / 2;
-                gsap.to(btn, { x: x * 0.25, y: y * 0.25, duration: 0.4, ease: 'power2.out' });
-            });
-
-            wrapper.addEventListener('mouseleave', () => {
-                gsap.to(btn, { x: 0, y: 0, duration: 0.6, ease: 'elastic.out(1, 0.5)' });
-            });
-        })();
+    update(){ this.y+=this.vy; this.x+=this.vx; this.rot+=this.rs; this.vy+=.03; this.op-=.003; return this.y<cc.height+20&&this.op>0; }
+    draw(){
+        ctx.save(); ctx.globalAlpha=Math.max(0,this.op);
+        ctx.translate(this.x,this.y); ctx.rotate(this.rot*Math.PI/180);
+        ctx.fillStyle=this.col;
+        if(this.circ){ ctx.beginPath(); ctx.arc(0,0,this.w/2,0,Math.PI*2); ctx.fill(); }
+        else { ctx.fillRect(-this.w/2,-this.h/2,this.w,this.h); }
+        ctx.restore();
     }
+}
 
-    // =============================================
-    // SMOOTH SCROLL
-    // =============================================
-    function scrollToSection(selector) {
-        const el = document.querySelector(selector);
-        if (el) {
-            el.scrollIntoView({ behavior: 'smooth' });
-        }
+function launchConfetti(){
+    const n = isTouch ? 60 : 120;
+    for(let i=0;i<n;i++) setTimeout(()=>pieces.push(new Piece()), Math.random()*600);
+    if(!anim){ anim=true; renderCC(); }
+}
+function renderCC(){
+    ctx.clearRect(0,0,cc.width,cc.height);
+    pieces=pieces.filter(p=>{ const ok=p.update(); if(ok) p.draw(); return ok; });
+    if(pieces.length>0) requestAnimationFrame(renderCC); else anim=false;
+}
+
+// ── Finale button ─────────────────────────────────
+let finDone=false;
+document.getElementById('finBtn').addEventListener('click', ()=>{
+    launchConfetti();
+    if(!finDone){
+        finDone=true;
+        setTimeout(()=> document.getElementById('finReveal').classList.add('show'), 350);
     }
+    gsap.fromTo('#finBtn',{scale:1},{scale:1.22,duration:.13,yoyo:true,repeat:1,ease:'power2.out'});
+});
 
-    // =============================================
-    // COMPLIMENTS ANIMATIONS
-    // =============================================
-    gsap.from('.compliments-label', {
-        scrollTrigger: { trigger: '#complimentsSection', start: 'top 80%' },
-        y: 25, opacity: 0, duration: 0.7
-    });
-
-    gsap.from('.compliments-title', {
-        scrollTrigger: { trigger: '#complimentsSection', start: 'top 75%' },
-        y: 35, opacity: 0, duration: 0.9, delay: 0.15
-    });
-
-    gsap.from('.carousel-card', {
-        scrollTrigger: { trigger: '.carousel', start: 'top 85%' },
-        y: 50, opacity: 0, scale: 0.97,
-        duration: 0.7, stagger: 0.12, ease: 'power3.out'
-    });
-
-    // Carousel dots
-    const carousel = document.getElementById('carousel');
-    const dots = document.querySelectorAll('.carousel-dot');
-    const cards = document.querySelectorAll('.carousel-card');
-
-    carousel.addEventListener('scroll', () => {
-        const scrollLeft = carousel.scrollLeft;
-        const cardWidth = cards[0].offsetWidth + 20;
-        const idx = Math.round(scrollLeft / cardWidth);
-        dots.forEach((d, i) => d.classList.toggle('active', i === idx));
-    }, { passive: true });
-
-    dots.forEach(dot => {
-        dot.addEventListener('click', () => {
-            const idx = parseInt(dot.dataset.index);
-            const cardWidth = cards[0].offsetWidth + 20;
-            carousel.scrollTo({ left: idx * cardWidth, behavior: 'smooth' });
-        });
-    });
-
-    // =============================================
-    // MESSAGE FOG EFFECT
-    // =============================================
-    (function initFogEffect() {
-        const messageCard = document.getElementById('messageCard');
-        const fogOverlay = document.getElementById('fogOverlay');
-        const fogHint = document.getElementById('fogHint');
-
-        if (!fogOverlay || !messageCard) return;
-
-        let fogCanvas, fogCtx;
-        let fogRevealed = 0;
-        let isSetup = false;
-
-        function setupFogCanvas() {
-            if (isSetup) return;
-            isSetup = true;
-            
-            fogCanvas = document.createElement('canvas');
-            const rect = messageCard.getBoundingClientRect();
-            fogCanvas.width = rect.width;
-            fogCanvas.height = rect.height;
-            fogCtx = fogCanvas.getContext('2d');
-
-            fogCtx.fillStyle = '#1a0a12';
-            fogCtx.fillRect(0, 0, fogCanvas.width, fogCanvas.height);
-            updateFogMask();
-        }
-
-        function updateFogMask() {
-            const dataUrl = fogCanvas.toDataURL();
-            fogOverlay.style.webkitMaskImage = `url(${dataUrl})`;
-            fogOverlay.style.maskImage = `url(${dataUrl})`;
-        }
-
-        function wipe(x, y) {
-            if (!fogCtx) return;
-            const rect = messageCard.getBoundingClientRect();
-            const cx = x - rect.left;
-            const cy = y - rect.top;
-
-            fogCtx.globalCompositeOperation = 'destination-out';
-            const radius = 45;
-            const gradient = fogCtx.createRadialGradient(cx, cy, 0, cx, cy, radius);
-            gradient.addColorStop(0, 'rgba(0,0,0,1)');
-            gradient.addColorStop(0.6, 'rgba(0,0,0,0.8)');
-            gradient.addColorStop(1, 'rgba(0,0,0,0)');
-            fogCtx.fillStyle = gradient;
-            fogCtx.beginPath();
-            fogCtx.arc(cx, cy, radius, 0, Math.PI * 2);
-            fogCtx.fill();
-
-            updateFogMask();
-
-            fogRevealed += 0.4;
-            if (fogRevealed > 12) {
-                gsap.to(fogHint, { opacity: 0, duration: 0.4 });
-            }
-            if (fogRevealed > 50) {
-                gsap.to(fogOverlay, { opacity: 0, duration: 1.2, ease: 'power2.out' });
-            }
-        }
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    setTimeout(setupFogCanvas, 200);
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.3 });
-
-        observer.observe(messageCard);
-
-        // Mouse events (desktop)
-        if (!isTouchDevice) {
-            messageCard.addEventListener('mousemove', e => wipe(e.clientX, e.clientY));
-        }
-
-        // Touch events (mobile)
-        messageCard.addEventListener('touchstart', e => {
-            if (e.touches[0]) wipe(e.touches[0].clientX, e.touches[0].clientY);
-        }, { passive: true });
-
-        messageCard.addEventListener('touchmove', e => {
-            if (e.touches[0]) wipe(e.touches[0].clientX, e.touches[0].clientY);
-        }, { passive: true });
-
-        gsap.from('.message-label', {
-            scrollTrigger: { trigger: '#messageSection', start: 'top 80%' },
-            y: 20, opacity: 0, duration: 0.7
-        });
-
-        gsap.from('.message-card', {
-            scrollTrigger: { trigger: '#messageSection', start: 'top 70%' },
-            y: 50, opacity: 0, scale: 0.97, duration: 0.9, ease: 'power3.out'
-        });
-    })();
-
-    // =============================================
-    // FINALE ANIMATIONS
-    // =============================================
-    gsap.from('.finale-emoji', {
-        scrollTrigger: { trigger: '#finaleSection', start: 'top 70%' },
-        y: 25, opacity: 0, scale: 0.5, duration: 0.7, ease: 'back.out(2)'
-    });
-
-    gsap.from('.finale-text', {
-        scrollTrigger: { trigger: '#finaleSection', start: 'top 65%' },
-        y: 35, opacity: 0, duration: 0.9, delay: 0.15
-    });
-
-    gsap.from('.finale-subtext', {
-        scrollTrigger: { trigger: '#finaleSection', start: 'top 60%' },
-        y: 15, opacity: 0, duration: 0.7, delay: 0.35
-    });
-
-    gsap.from('.finale-heart-btn', {
-        scrollTrigger: { trigger: '#finaleSection', start: 'top 55%' },
-        scale: 0, opacity: 0, duration: 0.7, delay: 0.5, ease: 'back.out(2)'
-    });
-
-    gsap.from('.finale-heart-hint', {
-        scrollTrigger: { trigger: '#finaleSection', start: 'top 55%' },
-        y: 10, opacity: 0, duration: 0.5, delay: 0.7
-    });
-
-    // =============================================
-    // CONFETTI
-    // =============================================
-    const confCanvas = document.getElementById('confettiCanvas');
-    const confCtx = confCanvas.getContext('2d');
-    let confettiPieces = [];
-    let confAnimating = false;
-
-    function resizeConfetti() {
-        confCanvas.width = window.innerWidth;
-        confCanvas.height = window.innerHeight;
-    }
-    resizeConfetti();
-    window.addEventListener('resize', resizeConfetti);
-
-    class Confetti {
-        constructor() {
-            this.x = Math.random() * confCanvas.width;
-            this.y = -10 - Math.random() * 80;
-            this.w = Math.random() * 8 + 4;
-            this.h = Math.random() * 5 + 2;
-            this.vx = (Math.random() - 0.5) * 5;
-            this.vy = Math.random() * 3.5 + 2.5;
-            this.rot = Math.random() * 360;
-            this.rotSpeed = (Math.random() - 0.5) * 10;
-            this.opacity = 1;
-            this.color = ['#FF4D85', '#FFB6D5', '#E0C3FC', '#FAD0C4', '#FF6B9D', '#FFD700'][
-                Math.floor(Math.random() * 6)
-            ];
-            this.shape = Math.random() > 0.5 ? 'rect' : 'circle';
-        }
-
-        update() {
-            this.y += this.vy;
-            this.x += this.vx;
-            this.rot += this.rotSpeed;
-            this.vy += 0.03;
-            this.vx *= 0.99;
-            this.opacity -= 0.005;
-            return this.y < confCanvas.height + 20 && this.opacity > 0;
-        }
-
-        draw() {
-            confCtx.save();
-            confCtx.globalAlpha = Math.max(0, this.opacity);
-            confCtx.translate(this.x, this.y);
-            confCtx.rotate((this.rot * Math.PI) / 180);
-            confCtx.fillStyle = this.color;
-
-            if (this.shape === 'rect') {
-                confCtx.fillRect(-this.w / 2, -this.h / 2, this.w, this.h);
-            } else {
-                confCtx.beginPath();
-                confCtx.arc(0, 0, this.w / 2, 0, Math.PI * 2);
-                confCtx.fill();
-            }
-            confCtx.restore();
-        }
-    }
-
-    function launchConfetti() {
-        const count = window.innerWidth < 500 ? 60 : 100;
-        for (let i = 0; i < count; i++) {
-            setTimeout(() => confettiPieces.push(new Confetti()), Math.random() * 400);
-        }
-        if (!confAnimating) {
-            confAnimating = true;
-            renderConfetti();
-        }
-    }
-
-    function renderConfetti() {
-        confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
-        confettiPieces = confettiPieces.filter(p => {
-            const alive = p.update();
-            if (alive) p.draw();
-            return alive;
-        });
-        if (confettiPieces.length > 0) {
-            requestAnimationFrame(renderConfetti);
-        } else {
-            confAnimating = false;
-        }
-    }
-
-    // =============================================
-    // FINALE TRIGGER
-    // =============================================
-    let finaleTriggered = false;
-
-    function triggerFinale() {
-        launchConfetti();
-        if (!finaleTriggered) {
-            finaleTriggered = true;
-            setTimeout(() => {
-                document.getElementById('finaleReveal').classList.add('show');
-            }, 350);
-        }
-
-        gsap.fromTo('#finaleHeartBtn', { scale: 1 }, {
-            scale: 1.25, duration: 0.12, yoyo: true, repeat: 1, ease: 'power2.out'
-        });
-    }
+// ── ScrollTrigger refresh ─────────────────────────
+if(document.fonts?.ready) document.fonts.ready.then(()=> ScrollTrigger.refresh());
+let stTimer;
+window.addEventListener('resize',()=>{ clearTimeout(stTimer); stTimer=setTimeout(()=> ScrollTrigger.refresh(), 200); });
 </script>
-
 </body>
 </html>
-```
-
-## Ключевые исправления для iPhone:
-
-| Проблема | Решение |
-|----------|---------|
-| **100vh включает адресную строку** | Добавлена CSS переменная `--vh` и JS для расчёта реальной высоты |
-| **Safe Area (чёлка)** | `viewport-fit=cover` + `env(safe-area-inset-*)` |
-| **Backdrop-filter** | Добавлены `-webkit-` префиксы везде |
-| **Touch events** | `{ passive: true }` для плавной прокрутки |
-| **Hover на touch** | `@media (hover: hover)` для разделения стилей |
-| **Курсор** | Скрыт только на desktop через медиа-запросы |
-| **Rubber-band scroll** | `overscroll-behavior: none` |
-| **Tap highlight** | `-webkit-tap-highlight-color: transparent` |
-| **Кнопки** | `touch-action: manipulation` для быстрого отклика |
-| **WebGL** | Fallback на CSS градиент если не поддерживается |
