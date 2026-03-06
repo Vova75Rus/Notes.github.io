@@ -2,19 +2,19 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Для Арины 💖 С 8 Марта</title>
     <meta name="description" content="Персональная открытка к 8 Марта для самой прекрасной Арины">
     <meta name="theme-color" content="#FF4D85">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta property="og:title" content="Для тебя, Арина 🌸">
     <meta property="og:description" content="Открой, чтобы увидеть кое-что особенное 💝">
 
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=Montserrat:wght@200;300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&display=swap" rel="stylesheet">
 
-    <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
@@ -54,11 +54,12 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         html {
             overflow-x: hidden;
-            scroll-behavior: auto; /* GSAP handles smooth scroll */
+            /* НЕ используем scroll-behavior: smooth — конфликт с iOS */
         }
 
         body {
@@ -68,79 +69,85 @@
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            cursor: none;
+            /* cursor: none убран — ломает тапы на iPhone */
         }
 
         a { text-decoration: none; color: inherit; }
-        button { border: none; outline: none; cursor: none; font-family: inherit; }
-        ::selection { background: rgba(255, 77, 133, 0.4); color: white; }
+
+        button {
+            border: none;
+            outline: none;
+            font-family: inherit;
+            cursor: pointer; /* обязательно pointer для iOS */
+            background: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        ::selection {
+            background: rgba(255, 77, 133, 0.4);
+            color: white;
+        }
 
         /* =============================================
-           CUSTOM CURSOR
+           CUSTOM CURSOR — только десктоп
            ============================================= */
-        .cursor-dot {
-            position: fixed;
-            width: 8px;
-            height: 8px;
-            background: var(--text-white);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 100000;
-            mix-blend-mode: difference;
-            transform: translate(-50%, -50%);
-            transition: width 0.3s, height 0.3s, background 0.3s;
-        }
-
-        .cursor-ring {
-            position: fixed;
-            width: 40px;
-            height: 40px;
-            border: 1.5px solid rgba(255, 255, 255, 0.5);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 99999;
-            transform: translate(-50%, -50%);
-            transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                        height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                        border-color 0.3s,
-                        background 0.3s;
-        }
-
+        .cursor-dot,
+        .cursor-ring,
         .cursor-glow {
-            position: fixed;
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255, 77, 133, 0.12) 0%, transparent 70%);
-            pointer-events: none;
-            z-index: 1;
-            transform: translate(-50%, -50%);
+            display: none; /* скрыты по умолчанию */
         }
 
-        .cursor-trail {
-            position: fixed;
-            pointer-events: none;
-            z-index: 99998;
-        }
+        @media (hover: hover) and (pointer: fine) {
+            body { cursor: none; }
+            button { cursor: none; }
 
-        .trail-dot {
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--pink-hot);
-            opacity: 0;
-            transform: translate(-50%, -50%);
-        }
+            .cursor-dot {
+                display: block;
+                position: fixed;
+                width: 8px;
+                height: 8px;
+                background: var(--text-white);
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 100000;
+                mix-blend-mode: difference;
+                transform: translate(-50%, -50%);
+                transition: width 0.3s, height 0.3s;
+            }
 
-        @media (max-width: 768px), (hover: none) {
-            .cursor-dot, .cursor-ring, .cursor-glow, .cursor-trail { display: none !important; }
-            body { cursor: auto; }
-            button { cursor: pointer; }
+            .cursor-ring {
+                display: block;
+                position: fixed;
+                width: 40px;
+                height: 40px;
+                border: 1.5px solid rgba(255, 255, 255, 0.5);
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 99999;
+                transform: translate(-50%, -50%);
+                transition:
+                    width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                    height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                    border-color 0.3s,
+                    background 0.3s;
+            }
+
+            .cursor-glow {
+                display: block;
+                position: fixed;
+                width: 200px;
+                height: 200px;
+                border-radius: 50%;
+                background: radial-gradient(circle, rgba(255, 77, 133, 0.12) 0%, transparent 70%);
+                pointer-events: none;
+                z-index: 1;
+                transform: translate(-50%, -50%);
+            }
         }
 
         /* =============================================
-           WEBGL CANVAS (FLUID BACKGROUND)
+           BACKGROUND CANVAS
            ============================================= */
         #fluid-canvas {
             position: fixed;
@@ -149,6 +156,22 @@
             width: 100%;
             height: 100%;
             z-index: 0;
+        }
+
+        /* Fallback если WebGL не поддерживается */
+        .bg-fallback {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            background: radial-gradient(ellipse at 20% 20%, #3a0a2a 0%, #1a0a12 40%, #0d0520 100%);
+            animation: bgShift 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes bgShift {
+            0%   { background: radial-gradient(ellipse at 20% 20%, #3a0a2a 0%, #1a0a12 50%, #0d0520 100%); }
+            50%  { background: radial-gradient(ellipse at 70% 60%, #2a0a3a 0%, #1a0a15 50%, #0d0509 100%); }
+            100% { background: radial-gradient(ellipse at 40% 80%, #3a0515 0%, #150a1a 50%, #050510 100%); }
         }
 
         /* =============================================
@@ -168,6 +191,7 @@
             border-radius: 50%;
             filter: blur(80px);
             opacity: 0.4;
+            will-change: transform;
         }
 
         .orb-1 {
@@ -200,27 +224,27 @@
 
         @keyframes orbDrift1 {
             0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(150px, 100px) scale(1.2); }
-            50% { transform: translate(80px, 250px) scale(0.9); }
-            75% { transform: translate(-50px, 150px) scale(1.1); }
+            25%       { transform: translate(150px, 100px) scale(1.2); }
+            50%       { transform: translate(80px, 250px) scale(0.9); }
+            75%       { transform: translate(-50px, 150px) scale(1.1); }
         }
 
         @keyframes orbDrift2 {
             0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(-120px, -80px) scale(1.15); }
-            66% { transform: translate(-60px, 120px) scale(0.85); }
+            33%       { transform: translate(-120px, -80px) scale(1.15); }
+            66%       { transform: translate(-60px, 120px) scale(0.85); }
         }
 
         @keyframes orbDrift3 {
             0%, 100% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(100px, -100px) scale(1.3); }
+            50%       { transform: translate(100px, -100px) scale(1.3); }
         }
 
         @keyframes orbDrift4 {
             0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(-80px, 60px) scale(1.1); }
-            50% { transform: translate(60px, -40px) scale(0.9); }
-            75% { transform: translate(30px, 80px) scale(1.15); }
+            25%       { transform: translate(-80px, 60px) scale(1.1); }
+            50%       { transform: translate(60px, -40px) scale(0.9); }
+            75%       { transform: translate(30px, 80px) scale(1.15); }
         }
 
         /* =============================================
@@ -239,22 +263,14 @@
             overflow: hidden;
         }
 
-        .preloader.done {
-            pointer-events: none;
-        }
-
         .preloader-heart-container {
             position: relative;
             width: 120px;
             height: 120px;
         }
 
-        .preloader-heart {
-            width: 100%;
-            height: 100%;
-        }
-
-        .preloader-heart svg {
+        .preloader-heart svg,
+        .preloader-heart-fill svg {
             width: 100%;
             height: 100%;
             filter: drop-shadow(0 0 40px rgba(255, 77, 133, 0.6));
@@ -266,7 +282,6 @@
             stroke-width: 2;
             stroke-dasharray: 300;
             stroke-dashoffset: 300;
-            filter: drop-shadow(0 0 8px rgba(255, 77, 133, 0.5));
         }
 
         .preloader-heart-fill {
@@ -276,12 +291,8 @@
             opacity: 0;
         }
 
-        .preloader-heart-fill svg {
-            width: 100%; height: 100%;
-        }
-
         .preloader-heart-fill path {
-            fill: url(#preloaderHeartFillGrad);
+            fill: url(#preloaderHeartFillGrad2);
         }
 
         .preloader-heart-glow {
@@ -319,12 +330,12 @@
         }
 
         /* =============================================
-           GLASS CARD BASE
+           GLASS CARD
            ============================================= */
         .glass {
             background: var(--glass-bg);
-            backdrop-filter: blur(var(--glass-blur));
             -webkit-backdrop-filter: blur(var(--glass-blur));
+            backdrop-filter: blur(var(--glass-blur));
             border: 1px solid var(--glass-border);
             border-radius: var(--radius);
             box-shadow: var(--glass-shadow), var(--glass-inner-glow);
@@ -343,28 +354,32 @@
             z-index: 1;
         }
 
-        .glass::after {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: radial-gradient(ellipse at var(--mouse-x, 50%) var(--mouse-y, 50%),
-                rgba(255, 255, 255, 0.08) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 2;
-            opacity: 0;
-            transition: opacity 0.5s;
-        }
+        /* Hover эффекты только на десктопе */
+        @media (hover: hover) and (pointer: fine) {
+            .glass::after {
+                content: '';
+                position: absolute;
+                top: -50%; left: -50%;
+                width: 200%; height: 200%;
+                background: radial-gradient(
+                    ellipse at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                    rgba(255, 255, 255, 0.08) 0%,
+                    transparent 50%
+                );
+                pointer-events: none;
+                z-index: 2;
+                opacity: 0;
+                transition: opacity 0.5s;
+            }
 
-        .glass:hover::after {
-            opacity: 1;
-        }
+            .glass:hover::after { opacity: 1; }
 
-        .glass:hover {
-            background: var(--glass-bg-hover);
-            border-color: var(--glass-border-hover);
-            box-shadow: var(--glass-shadow-hover), var(--glass-inner-glow);
-            transform: translateY(-4px) scale(1.02);
+            .glass:hover {
+                background: var(--glass-bg-hover);
+                border-color: var(--glass-border-hover);
+                box-shadow: var(--glass-shadow-hover), var(--glass-inner-glow);
+                transform: translateY(-4px) scale(1.02);
+            }
         }
 
         .glass-highlight {
@@ -378,7 +393,7 @@
         }
 
         /* =============================================
-           CONTENT WRAPPER
+           LAYOUT
            ============================================= */
         .content {
             position: relative;
@@ -387,10 +402,13 @@
 
         .section {
             min-height: 100vh;
+            min-height: 100dvh; /* iOS safe */
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 80px 24px;
+            padding-top: max(80px, env(safe-area-inset-top) + 40px);
+            padding-bottom: max(80px, env(safe-area-inset-bottom) + 40px);
             position: relative;
         }
 
@@ -401,12 +419,11 @@
         }
 
         /* =============================================
-           SCREEN 1: HERO
+           HERO
            ============================================= */
         .hero {
             flex-direction: column;
             text-align: center;
-            gap: 0;
         }
 
         .hero-label {
@@ -417,11 +434,6 @@
             text-transform: uppercase;
             color: var(--text-muted);
             margin-bottom: 30px;
-            overflow: hidden;
-        }
-
-        .hero-label span {
-            display: inline-block;
         }
 
         .hero-title {
@@ -429,7 +441,6 @@
             font-weight: 400;
             line-height: 1.2;
             margin-bottom: 10px;
-            overflow: hidden;
         }
 
         .hero-title .line {
@@ -443,26 +454,25 @@
         }
 
         .hero-title .line-1 span {
-            font-size: clamp(36px, 8vw, 72px);
+            font-size: clamp(28px, 6vw, 64px);
             font-weight: 300;
             font-style: italic;
             color: var(--text-pearl);
         }
 
         .hero-title .line-2 span {
-            font-size: clamp(52px, 12vw, 110px);
+            font-size: clamp(48px, 10vw, 100px);
             font-weight: 900;
             background: linear-gradient(135deg, #FFFFFF 0%, #FFB6D5 40%, #E0C3FC 70%, #FFFFFF 100%);
             background-size: 300% 100%;
             -webkit-background-clip: text;
-            background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
             animation: shimmer 4s ease infinite;
-            filter: drop-shadow(0 0 30px rgba(255, 77, 133, 0.3));
         }
 
         @keyframes shimmer {
-            0% { background-position: 300% center; }
+            0%   { background-position: 300% center; }
             100% { background-position: -300% center; }
         }
 
@@ -473,15 +483,10 @@
             letter-spacing: 4px;
             color: var(--text-muted);
             margin-top: 20px;
-            margin-bottom: 60px;
-            overflow: hidden;
+            margin-bottom: 50px;
         }
 
-        .hero-date span {
-            display: inline-block;
-        }
-
-        /* Magnetic Button */
+        /* Кнопка */
         .magnetic-btn-wrapper {
             display: inline-block;
             position: relative;
@@ -493,8 +498,8 @@
             gap: 10px;
             padding: 18px 44px;
             background: rgba(255, 255, 255, 0.07);
-            backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: var(--radius-pill);
             color: var(--text-white);
@@ -506,25 +511,22 @@
             transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             position: relative;
             overflow: hidden;
+            /* Важно для iOS: кнопка должна быть кликабельна */
+            touch-action: manipulation;
         }
 
-        .magnetic-btn::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            transition: left 0.6s;
-        }
-
-        .magnetic-btn:hover::before {
-            left: 100%;
-        }
-
-        .magnetic-btn:hover {
+        .magnetic-btn:active {
             background: rgba(255, 255, 255, 0.14);
             border-color: rgba(255, 255, 255, 0.4);
-            box-shadow: 0 0 40px rgba(255, 77, 133, 0.2), inset 0 1px 0 rgba(255,255,255,0.3);
+            transform: scale(0.97);
+        }
+
+        @media (hover: hover) {
+            .magnetic-btn:hover {
+                background: rgba(255, 255, 255, 0.14);
+                border-color: rgba(255, 255, 255, 0.4);
+                box-shadow: 0 0 40px rgba(255, 77, 133, 0.2), inset 0 1px 0 rgba(255,255,255,0.3);
+            }
         }
 
         .magnetic-btn .btn-arrow {
@@ -532,20 +534,14 @@
             transition: transform 0.3s;
         }
 
-        .magnetic-btn:hover .btn-arrow {
-            transform: translateY(3px);
-        }
-
-        /* Scroll Indicator */
         .scroll-indicator {
             position: absolute;
-            bottom: 40px;
+            bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
             opacity: 0;
         }
 
@@ -568,20 +564,18 @@
         }
 
         @keyframes scrollLineMove {
-            0% { top: -50%; }
+            0%   { top: -50%; }
             100% { top: 150%; }
         }
 
         /* =============================================
-           SCREEN 2: COMPLIMENTS CAROUSEL
+           COMPLIMENTS
            ============================================= */
-        .compliments {
-            overflow: hidden;
-        }
+        .compliments { overflow: hidden; }
 
         .compliments-header {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 50px;
         }
 
         .compliments-label {
@@ -596,7 +590,7 @@
 
         .compliments-title {
             font-family: var(--font-display);
-            font-size: clamp(32px, 6vw, 56px);
+            font-size: clamp(28px, 5vw, 52px);
             font-weight: 700;
             font-style: italic;
             color: var(--text-white);
@@ -604,39 +598,40 @@
 
         .carousel {
             display: flex;
-            gap: 24px;
+            gap: 20px;
             padding: 20px 0;
             overflow-x: auto;
             scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
             -ms-overflow-style: none;
-            padding-left: max(24px, calc((100vw - 1000px) / 2));
+            padding-left: 24px;
             padding-right: 24px;
+            /* Убираем overscroll чтобы не мешать скроллу страницы */
+            overscroll-behavior-x: contain;
         }
 
         .carousel::-webkit-scrollbar { display: none; }
 
         .carousel-card {
-            min-width: 300px;
-            max-width: 340px;
-            padding: 40px 32px;
+            min-width: 280px;
+            max-width: 320px;
+            padding: 36px 28px;
             scroll-snap-align: center;
             flex-shrink: 0;
             text-align: center;
             border-radius: var(--radius-lg);
-            perspective: 800px;
         }
 
         .carousel-card .card-number {
             font-family: var(--font-display);
-            font-size: 64px;
+            font-size: 56px;
             font-weight: 900;
             font-style: italic;
             background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%);
             -webkit-background-clip: text;
-            background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
             line-height: 1;
             margin-bottom: 20px;
             position: relative;
@@ -645,7 +640,7 @@
 
         .carousel-card .card-text {
             font-family: var(--font-accent);
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 400;
             font-style: italic;
             line-height: 1.6;
@@ -655,9 +650,9 @@
         }
 
         .carousel-card .card-emoji {
-            font-size: 40px;
+            font-size: 36px;
             display: block;
-            margin-top: 20px;
+            margin-top: 18px;
             position: relative;
             z-index: 4;
         }
@@ -666,7 +661,7 @@
             display: flex;
             justify-content: center;
             gap: 8px;
-            margin-top: 30px;
+            margin-top: 24px;
         }
 
         .carousel-dot {
@@ -676,6 +671,10 @@
             background: rgba(255, 255, 255, 0.2);
             transition: all 0.3s;
             cursor: pointer;
+            /* Увеличиваем tap-область для iPhone */
+            padding: 6px;
+            margin: -6px;
+            touch-action: manipulation;
         }
 
         .carousel-dot.active {
@@ -685,7 +684,7 @@
         }
 
         /* =============================================
-           SCREEN 3: MESSAGE (FOG EFFECT)
+           MESSAGE SECTION
            ============================================= */
         .message-section {
             flex-direction: column;
@@ -706,15 +705,14 @@
             max-width: 650px;
             width: 100%;
             margin: 0 auto;
-            padding: 60px 40px;
+            padding: 50px 36px;
             border-radius: var(--radius-lg);
             position: relative;
-            min-height: 400px;
         }
 
         .message-envelope-icon {
-            font-size: 48px;
-            margin-bottom: 30px;
+            font-size: 44px;
+            margin-bottom: 28px;
             display: block;
             position: relative;
             z-index: 5;
@@ -722,7 +720,7 @@
 
         .message-text {
             font-family: var(--font-accent);
-            font-size: clamp(18px, 3vw, 24px);
+            font-size: clamp(17px, 2.5vw, 22px);
             font-weight: 400;
             line-height: 1.9;
             color: var(--text-pearl);
@@ -730,34 +728,28 @@
             z-index: 5;
         }
 
-        .message-text p {
-            margin-bottom: 18px;
-        }
+        .message-text p { margin-bottom: 16px; }
 
         .message-signature {
             font-family: var(--font-display);
-            font-size: 22px;
+            font-size: 20px;
             font-style: italic;
             color: var(--pink-pastel);
-            margin-top: 30px;
+            margin-top: 28px;
             position: relative;
             z-index: 5;
         }
 
-        /* Fog Overlay */
+        /* ——— Fog Effect (переработан для iOS) ——— */
         .fog-overlay {
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
             z-index: 6;
             border-radius: var(--radius-lg);
-            background: radial-gradient(ellipse at center,
-                rgba(26, 10, 18, 0.85) 0%,
-                rgba(26, 10, 18, 0.95) 100%);
+            background: rgba(20, 6, 14, 0.92);
             pointer-events: none;
-            -webkit-mask-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='white'/></svg>");
-            mask-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='white'/></svg>");
-            transition: opacity 0.3s;
+            transition: opacity 1.5s ease;
         }
 
         .fog-hint {
@@ -773,21 +765,44 @@
             text-align: center;
             pointer-events: none;
             transition: opacity 0.5s;
+            white-space: nowrap;
         }
 
-        .fog-hint span {
+        .fog-hint .fog-icon {
             display: block;
             font-size: 28px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
+        }
+
+        /* Touch indicator для мобильных */
+        .fog-touch-indicator {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9;
+            background: radial-gradient(
+                circle,
+                rgba(255, 77, 133, 0.4) 0%,
+                rgba(255, 77, 133, 0.1) 50%,
+                transparent 70%
+            );
+            transform: translate(-50%, -50%) scale(0);
+            width: 100px;
+            height: 100px;
+            transition: transform 0.15s ease-out;
+        }
+
+        .fog-touch-indicator.active {
+            transform: translate(-50%, -50%) scale(1);
         }
 
         /* =============================================
-           SCREEN 4: FINALE
+           FINALE
            ============================================= */
         .finale {
             flex-direction: column;
             text-align: center;
-            gap: 10px;
+            gap: 0;
         }
 
         .finale-emoji {
@@ -797,12 +812,12 @@
 
         .finale-text {
             font-family: var(--font-display);
-            font-size: clamp(28px, 6vw, 52px);
+            font-size: clamp(26px, 5vw, 48px);
             font-weight: 400;
             font-style: italic;
             line-height: 1.4;
             color: var(--text-pearl);
-            max-width: 600px;
+            max-width: 580px;
         }
 
         .finale-text em {
@@ -832,9 +847,12 @@
             border-radius: 50%;
             font-size: 40px;
             cursor: pointer;
-            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: all 0.4s ease;
             animation: heartGlow 3s ease-in-out infinite;
             position: relative;
+            touch-action: manipulation;
+            /* Убираем задержку клика на iOS */
+            -webkit-tap-highlight-color: transparent;
         }
 
         .finale-heart-btn::before {
@@ -846,20 +864,19 @@
             animation: heartRing 3s ease-in-out infinite;
         }
 
+        .finale-heart-btn:active {
+            transform: scale(0.92);
+            background: rgba(255, 77, 133, 0.3);
+        }
+
         @keyframes heartGlow {
             0%, 100% { box-shadow: 0 0 30px rgba(255, 77, 133, 0.2); }
-            50% { box-shadow: 0 0 60px rgba(255, 77, 133, 0.4); }
+            50%       { box-shadow: 0 0 60px rgba(255, 77, 133, 0.4); }
         }
 
         @keyframes heartRing {
             0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.15); opacity: 0; }
-        }
-
-        .finale-heart-btn:hover {
-            background: rgba(255, 77, 133, 0.3);
-            border-color: rgba(255, 77, 133, 0.5);
-            transform: scale(1.1);
+            50%       { transform: scale(1.15); opacity: 0; }
         }
 
         .finale-heart-hint {
@@ -867,20 +884,19 @@
             font-weight: 300;
             letter-spacing: 3px;
             color: var(--text-muted);
-            margin-top: 16px;
+            margin-top: 14px;
             text-transform: uppercase;
         }
 
         .finale-reveal {
             margin-top: 40px;
             font-family: var(--font-display);
-            font-size: clamp(24px, 5vw, 42px);
+            font-size: clamp(22px, 4.5vw, 38px);
             font-weight: 700;
             font-style: italic;
             color: var(--text-white);
             opacity: 0;
             transform: scale(0.8) translateY(20px);
-            filter: blur(10px);
             transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             text-shadow: 0 0 40px rgba(255, 77, 133, 0.5);
         }
@@ -888,7 +904,6 @@
         .finale-reveal.show {
             opacity: 1;
             transform: scale(1) translateY(0);
-            filter: blur(0);
         }
 
         /* =============================================
@@ -906,20 +921,26 @@
            RESPONSIVE
            ============================================= */
         @media (max-width: 768px) {
-            .section { padding: 60px 20px; }
-            .message-card { padding: 40px 24px; }
-            .carousel-card { min-width: 260px; padding: 32px 24px; }
-            .carousel-card .card-text { font-size: 19px; }
-            .carousel-card .card-number { font-size: 48px; }
-            .finale-heart-btn { width: 70px; height: 70px; font-size: 32px; }
-
-            .orb-1 { width: 250px; height: 250px; }
-            .orb-2 { width: 200px; height: 200px; }
+            .section { padding: 50px 16px; }
+            .message-card { padding: 36px 20px; }
+            .carousel-card { min-width: 260px; padding: 28px 20px; }
+            .carousel-card .card-text { font-size: 18px; }
+            .carousel-card .card-number { font-size: 44px; }
+            .finale-heart-btn { width: 76px; height: 76px; font-size: 34px; }
             .orb-3, .orb-4 { display: none; }
+            .orb-1 { width: 220px; height: 220px; filter: blur(50px); }
+            .orb-2 { width: 180px; height: 180px; filter: blur(50px); }
         }
 
-        @media (max-width: 380px) {
+        @media (max-width: 390px) {
+            /* iPhone 14/15 стандарт */
+            .hero-label { letter-spacing: 3px; }
+            .magnetic-btn { padding: 16px 32px; font-size: 12px; letter-spacing: 2px; }
             .carousel-card { min-width: 240px; }
+        }
+
+        @media (max-width: 320px) {
+            .carousel-card { min-width: 210px; padding: 24px 16px; }
         }
 
         /* =============================================
@@ -935,895 +956,890 @@
         }
     </style>
 </head>
-
 <body>
 
-    <!-- CUSTOM CURSOR -->
-    <div class="cursor-dot" id="cursorDot"></div>
-    <div class="cursor-ring" id="cursorRing"></div>
-    <div class="cursor-glow" id="cursorGlow"></div>
+<!-- CUSTOM CURSOR (только десктоп) -->
+<div class="cursor-dot"  id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="cursor-glow" id="cursorGlow"></div>
 
-    <!-- CONFETTI CANVAS -->
-    <canvas class="confetti-canvas" id="confettiCanvas"></canvas>
+<!-- CONFETTI -->
+<canvas class="confetti-canvas" id="confettiCanvas"></canvas>
 
-    <!-- WEBGL FLUID BACKGROUND -->
-    <canvas id="fluid-canvas"></canvas>
+<!-- BACKGROUND -->
+<canvas id="fluid-canvas"></canvas>
+<div class="bg-fallback" id="bgFallback" style="display:none;"></div>
 
-    <!-- LIGHT ORBS -->
-    <div class="orbs-container">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-        <div class="orb orb-4"></div>
+<!-- ORBS -->
+<div class="orbs-container">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="orb orb-4"></div>
+</div>
+
+<!-- PRELOADER -->
+<div class="preloader" id="preloader">
+    <div class="preloader-heart-glow" id="preloaderGlow"></div>
+    <div class="preloader-heart-container">
+        <div class="preloader-heart">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="preloaderHeartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%"   stop-color="#FF4D85"/>
+                        <stop offset="50%"  stop-color="#FFB6D5"/>
+                        <stop offset="100%" stop-color="#E0C3FC"/>
+                    </linearGradient>
+                </defs>
+                <path d="M50 88 C25 65, 2 45, 2 28 C2 14, 13 3, 27 3 C35 3, 43 8, 50 18 C57 8, 65 3, 73 3 C87 3, 98 14, 98 28 C98 45, 75 65, 50 88Z"/>
+            </svg>
+        </div>
+        <div class="preloader-heart-fill">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="preloaderHeartFillGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%"   stop-color="#FF4D85"/>
+                        <stop offset="100%" stop-color="#E0C3FC"/>
+                    </linearGradient>
+                </defs>
+                <path d="M50 88 C25 65, 2 45, 2 28 C2 14, 13 3, 27 3 C35 3, 43 8, 50 18 C57 8, 65 3, 73 3 C87 3, 98 14, 98 28 C98 45, 75 65, 50 88Z"/>
+            </svg>
+        </div>
     </div>
+    <p class="preloader-text" id="preloaderText">создаю для тебя...</p>
+    <div class="preloader-particles" id="preloaderParticles"></div>
+</div>
 
-    <!-- PRELOADER -->
-    <div class="preloader" id="preloader">
-        <div class="preloader-heart-glow" id="preloaderGlow"></div>
-        <div class="preloader-heart-container">
-            <div class="preloader-heart">
-                <svg viewBox="0 0 100 100">
-                    <defs>
-                        <linearGradient id="preloaderHeartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#FF4D85"/>
-                            <stop offset="50%" stop-color="#FFB6D5"/>
-                            <stop offset="100%" stop-color="#E0C3FC"/>
-                        </linearGradient>
-                        <linearGradient id="preloaderHeartFillGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#FF4D85"/>
-                            <stop offset="100%" stop-color="#E0C3FC"/>
-                        </linearGradient>
-                    </defs>
-                    <path d="M50 88 C25 65, 2 45, 2 28 C2 14, 13 3, 27 3 C35 3, 43 8, 50 18 C57 8, 65 3, 73 3 C87 3, 98 14, 98 28 C98 45, 75 65, 50 88Z"/>
-                </svg>
+<!-- ========= MAIN CONTENT ========= -->
+<div class="content" id="content">
+
+    <!-- HERO -->
+    <section class="section hero" id="heroSection">
+        <p class="hero-label">С днём весны и красоты</p>
+
+        <h1 class="hero-title">
+            <span class="line line-1"><span>Для самой прекрасной</span></span>
+            <span class="line line-2"><span>Арины</span></span>
+        </h1>
+
+        <p class="hero-date">8 марта 2025</p>
+
+        <div class="magnetic-btn-wrapper" id="magneticWrapper">
+            <button class="magnetic-btn" id="magneticBtn">
+                Коснись меня
+                <span class="btn-arrow">↓</span>
+            </button>
+        </div>
+
+        <div class="scroll-indicator" id="scrollIndicator">
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- COMPLIMENTS -->
+    <section class="section compliments" id="complimentsSection">
+        <div class="section-inner">
+            <div class="compliments-header">
+                <p class="compliments-label">Почему ты особенная</p>
+                <h2 class="compliments-title">Слова для тебя</h2>
             </div>
-            <div class="preloader-heart-fill">
-                <svg viewBox="0 0 100 100">
-                    <defs>
-                        <linearGradient id="preloaderHeartFillGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#FF4D85"/>
-                            <stop offset="100%" stop-color="#E0C3FC"/>
-                        </linearGradient>
-                    </defs>
-                    <path d="M50 88 C25 65, 2 45, 2 28 C2 14, 13 3, 27 3 C35 3, 43 8, 50 18 C57 8, 65 3, 73 3 C87 3, 98 14, 98 28 C98 45, 75 65, 50 88Z"
-                          fill="url(#preloaderHeartFillGrad2)"/>
-                </svg>
+
+            <div class="carousel" id="carousel">
+                <div class="carousel-card glass">
+                    <div class="glass-highlight"></div>
+                    <span class="card-number">01</span>
+                    <p class="card-text">Ты освещаешь всё вокруг одной только улыбкой. Рядом с тобой мир становится теплее.</p>
+                    <span class="card-emoji">✨</span>
+                </div>
+                <div class="carousel-card glass">
+                    <div class="glass-highlight"></div>
+                    <span class="card-number">02</span>
+                    <p class="card-text">В тебе столько нежности и силы одновременно. Это вдохновляет и восхищает.</p>
+                    <span class="card-emoji">🌸</span>
+                </div>
+                <div class="carousel-card glass">
+                    <div class="glass-highlight"></div>
+                    <span class="card-number">03</span>
+                    <p class="card-text">Твой смех — лучшая мелодия. Он заставляет забыть обо всём на свете.</p>
+                    <span class="card-emoji">🎵</span>
+                </div>
+                <div class="carousel-card glass">
+                    <div class="glass-highlight"></div>
+                    <span class="card-number">04</span>
+                    <p class="card-text">Ты умеешь находить красоту в мелочах и превращать обычные моменты в волшебные.</p>
+                    <span class="card-emoji">🦋</span>
+                </div>
+                <div class="carousel-card glass">
+                    <div class="glass-highlight"></div>
+                    <span class="card-number">05</span>
+                    <p class="card-text">С тобой каждый день — как маленький праздник. Ты и есть весна.</p>
+                    <span class="card-emoji">🌷</span>
+                </div>
+            </div>
+
+            <div class="carousel-dots" id="carouselDots">
+                <div class="carousel-dot active" data-index="0"></div>
+                <div class="carousel-dot" data-index="1"></div>
+                <div class="carousel-dot" data-index="2"></div>
+                <div class="carousel-dot" data-index="3"></div>
+                <div class="carousel-dot" data-index="4"></div>
             </div>
         </div>
-        <p class="preloader-text" id="preloaderText">создаю для тебя...</p>
-        <div class="preloader-particles" id="preloaderParticles"></div>
-    </div>
+    </section>
 
-    <!-- ========= MAIN CONTENT ========= -->
-    <div class="content" id="content">
+    <!-- MESSAGE -->
+    <section class="section message-section" id="messageSection">
+        <p class="message-label">Главное послание</p>
 
-        <!-- SCREEN 1: HERO -->
-        <section class="section hero" id="heroSection">
-            <div class="hero-label">
-                <span>С днём весны и красоты</span>
+        <div class="message-card glass" id="messageCard">
+            <div class="glass-highlight"></div>
+            <span class="message-envelope-icon">💌</span>
+
+            <div class="message-text">
+                <p>Дорогая Арина,</p>
+                <p>В этот весенний день хочу сказать тебе то, что порой забываешь услышать в суете дней: ты — невероятная. Не просто красивая, не просто умная, а по-настоящему особенная.</p>
+                <p>Ты наполняешь собой пространство так, что оно начинает дышать. Рядом с тобой расцветает всё — от мыслей до мечтаний.</p>
+                <p>Пусть этот день станет началом самой прекрасной весны в твоей жизни. Ты заслуживаешь каждого луча солнца, каждого тёплого слова и каждого исполненного желания. 🌸</p>
             </div>
 
-            <h1 class="hero-title">
-                <span class="line line-1"><span>Для самой прекрасной</span></span>
-                <span class="line line-2"><span>Арины</span></span>
-            </h1>
+            <p class="message-signature">С бесконечной нежностью ❤️</p>
 
-            <p class="hero-date"><span>8 марта 2025</span></p>
-
-            <div class="magnetic-btn-wrapper" id="magneticWrapper">
-                <button class="magnetic-btn" id="magneticBtn" onclick="scrollToSection('#complimentsSection')">
-                    Коснись меня
-                    <span class="btn-arrow">↓</span>
-                </button>
+            <!-- Fog overlay (CSS-based, без canvas mask) -->
+            <div class="fog-overlay" id="fogOverlay"></div>
+            <div class="fog-touch-indicator" id="fogTouchIndicator"></div>
+            <div class="fog-hint" id="fogHint">
+                <span class="fog-icon">👆</span>
+                Коснись, чтобы прочитать
             </div>
+        </div>
+    </section>
 
-            <div class="scroll-indicator" id="scrollIndicator">
-                <div class="scroll-line"></div>
-            </div>
-        </section>
+    <!-- FINALE -->
+    <section class="section finale" id="finaleSection">
+        <p class="finale-emoji">🌙</p>
+        <p class="finale-text">
+            <em>Улыбнись.</em><br>
+            Тебе очень идёт.
+        </p>
+        <p class="finale-subtext">Арина, ты — лучшее, что есть</p>
 
-        <!-- SCREEN 2: COMPLIMENTS -->
-        <section class="section compliments" id="complimentsSection">
-            <div class="section-inner">
-                <div class="compliments-header">
-                    <p class="compliments-label">Почему ты особенная</p>
-                    <h2 class="compliments-title">Слова для тебя</h2>
-                </div>
+        <button
+            class="finale-heart-btn"
+            id="finaleHeartBtn"
+            aria-label="Нажми чтобы увидеть поздравление"
+        >
+            💖
+        </button>
+        <p class="finale-heart-hint">нажми</p>
 
-                <div class="carousel" id="carousel">
-                    <div class="carousel-card glass">
-                        <div class="glass-highlight"></div>
-                        <span class="card-number">01</span>
-                        <p class="card-text">Ты освещаешь всё вокруг одной только улыбкой. Рядом с тобой мир становится теплее.</p>
-                        <span class="card-emoji">✨</span>
-                    </div>
-                    <div class="carousel-card glass">
-                        <div class="glass-highlight"></div>
-                        <span class="card-number">02</span>
-                        <p class="card-text">В тебе столько нежности и силы одновременно. Это вдохновляет и восхищает.</p>
-                        <span class="card-emoji">🌸</span>
-                    </div>
-                    <div class="carousel-card glass">
-                        <div class="glass-highlight"></div>
-                        <span class="card-number">03</span>
-                        <p class="card-text">Твой смех — лучшая мелодия. Он заставляет забыть обо всём на свете.</p>
-                        <span class="card-emoji">🎵</span>
-                    </div>
-                    <div class="carousel-card glass">
-                        <div class="glass-highlight"></div>
-                        <span class="card-number">04</span>
-                        <p class="card-text">Ты умеешь находить красоту в мелочах и превращать обычные моменты в волшебные.</p>
-                        <span class="card-emoji">🦋</span>
-                    </div>
-                    <div class="carousel-card glass">
-                        <div class="glass-highlight"></div>
-                        <span class="card-number">05</span>
-                        <p class="card-text">С тобой каждый день — как маленький праздник. Ты и есть весна.</p>
-                        <span class="card-emoji">🌷</span>
-                    </div>
-                </div>
+        <p class="finale-reveal" id="finaleReveal">
+            С 8 Марта, любимая Арина! 🌸
+        </p>
+    </section>
 
-                <div class="carousel-dots" id="carouselDots">
-                    <div class="carousel-dot active" data-index="0"></div>
-                    <div class="carousel-dot" data-index="1"></div>
-                    <div class="carousel-dot" data-index="2"></div>
-                    <div class="carousel-dot" data-index="3"></div>
-                    <div class="carousel-dot" data-index="4"></div>
-                </div>
-            </div>
-        </section>
+</div><!-- /content -->
 
-        <!-- SCREEN 3: MESSAGE -->
-        <section class="section message-section" id="messageSection">
-            <p class="message-label">Главное послание</p>
 
-            <div class="message-card glass" id="messageCard">
-                <div class="glass-highlight"></div>
-                <span class="message-envelope-icon">💌</span>
+<!-- ================================================
+     JAVASCRIPT
+     ================================================ -->
+<script>
+// =============================================
+// HELPERS
+// =============================================
+const isTouchDevice = window.matchMedia('(hover: none)').matches
+                   || ('ontouchstart' in window);
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
-                <div class="message-text">
-                    <p>Дорогая Арина,</p>
-                    <p>В этот весенний день хочу сказать тебе то, что порой забываешь услышать в суете дней: ты — невероятная. Не просто красивая, не просто умная, а по-настоящему особенная.</p>
-                    <p>Ты наполняешь собой пространство так, что оно начинает дышать. Рядом с тобой расцветает всё — от мыслей до мечтаний.</p>
-                    <p>Пусть этот день станет началом самой прекрасной весны в твоей жизни. Ты заслуживаешь каждого луча солнца, каждого тёплого слова и каждого исполненного желания. 🌸</p>
-                </div>
+// =============================================
+// GSAP REGISTER
+// =============================================
+gsap.registerPlugin(ScrollTrigger);
 
-                <p class="message-signature">С бесконечной нежностью ❤️</p>
+// ScrollTrigger нормальнее работает без smooth scroll на iOS
+ScrollTrigger.config({ ignoreMobileResize: true });
 
-                <div class="fog-overlay" id="fogOverlay"></div>
-                <div class="fog-hint" id="fogHint">
-                    <span>👆</span>
-                    Проведи по стеклу,<br>чтобы прочитать
-                </div>
-            </div>
-        </section>
+// =============================================
+// WEBGL FLUID BACKGROUND
+// =============================================
+(function initFluid() {
+    const canvas = document.getElementById('fluid-canvas');
 
-        <!-- SCREEN 4: FINALE -->
-        <section class="section finale" id="finaleSection">
-            <p class="finale-emoji">🌙</p>
-            <p class="finale-text">
-                <em>Улыбнись.</em><br>
-                Тебе очень идёт.
-            </p>
-            <p class="finale-subtext">Арина, ты — лучшее, что есть</p>
+    // iOS Safari иногда даёт контекст, но с ограничениями
+    // Используем более безопасную инициализацию
+    let gl = null;
+    try {
+        gl = canvas.getContext('webgl', { antialias: false, alpha: false })
+             || canvas.getContext('experimental-webgl', { antialias: false, alpha: false });
+    } catch(e) { gl = null; }
 
-            <button class="finale-heart-btn" id="finaleHeartBtn" onclick="triggerFinale()">
-                💖
-            </button>
-            <p class="finale-heart-hint">нажми</p>
+    if (!gl) {
+        canvas.style.display = 'none';
+        document.getElementById('bgFallback').style.display = 'block';
+        return;
+    }
 
-            <p class="finale-reveal" id="finaleReveal">
-                С 8 Марта, любимая Арина! 🌸
-            </p>
-        </section>
+    let width, height, mouseX = 0.5, mouseY = 0.5, time = 0;
+    let animFrameId = null;
 
-    </div>
+    function resize() {
+        width  = canvas.width  = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+        gl.viewport(0, 0, width, height);
+    }
+    resize();
 
-    <!-- ========================================
-         JAVASCRIPT
-         ======================================== -->
-    <script>
-        // =============================================
-        // GSAP REGISTER
-        // =============================================
-        gsap.registerPlugin(ScrollTrigger);
+    // Дебаунс resize для iOS (адресная строка)
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(resize, 100);
+    });
 
-        // =============================================
-        // WEBGL FLUID BACKGROUND
-        // =============================================
-        (function initFluid() {
-            const canvas = document.getElementById('fluid-canvas');
-            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    const vertSrc = `
+        attribute vec2 position;
+        void main() {
+            gl_Position = vec4(position, 0.0, 1.0);
+        }
+    `;
 
-            if (!gl) {
-                // Fallback: CSS gradient
-                canvas.style.background = 'linear-gradient(135deg, #1a0a12 0%, #2a0a1a 30%, #1a0a20 60%, #0d0509 100%)';
-                return;
-            }
+    const fragSrc = `
+        precision mediump float;
+        uniform float u_time;
+        uniform vec2 u_resolution;
+        uniform vec2 u_mouse;
 
-            let width, height, mouseX = 0.5, mouseY = 0.5, time = 0;
+        vec3 palette(float t) {
+            vec3 a = vec3(0.15, 0.04, 0.08);
+            vec3 b = vec3(0.6,  0.15, 0.3);
+            vec3 c = vec3(0.4,  0.2,  0.5);
+            vec3 d = vec3(0.15, 0.1,  0.2);
+            return a + b * cos(6.28318 * (c * t + d));
+        }
 
-            function resize() {
-                width = canvas.width = window.innerWidth;
-                height = canvas.height = window.innerHeight;
-                gl.viewport(0, 0, width, height);
-            }
-            resize();
-            window.addEventListener('resize', resize);
+        void main() {
+            vec2 uv    = gl_FragCoord.xy / u_resolution;
+            vec2 mouse = u_mouse;
+            float dist = length(uv - mouse);
 
-            // Vertex Shader
-            const vertSrc = `
-                attribute vec2 position;
-                void main() {
-                    gl_Position = vec4(position, 0.0, 1.0);
-                }
-            `;
+            float wave1 = sin(uv.x * 4.0 + u_time * 0.4 + dist * 3.0) * 0.5 + 0.5;
+            float wave2 = sin(uv.y * 3.0 - u_time * 0.3 + dist * 2.0) * 0.5 + 0.5;
+            float wave3 = sin((uv.x + uv.y) * 2.5 + u_time * 0.2) * 0.5 + 0.5;
 
-            // Fragment Shader — Liquid Pink Gradient
-            const fragSrc = `
-                precision mediump float;
-                uniform float u_time;
-                uniform vec2 u_resolution;
-                uniform vec2 u_mouse;
+            float pattern    = wave1 * 0.4 + wave2 * 0.35 + wave3 * 0.25;
+            float mouseGlow  = smoothstep(0.4, 0.0, dist) * 0.3;
 
-                vec3 palette(float t) {
-                    vec3 a = vec3(0.15, 0.04, 0.08);
-                    vec3 b = vec3(0.6, 0.15, 0.3);
-                    vec3 c = vec3(0.4, 0.2, 0.5);
-                    vec3 d = vec3(0.15, 0.1, 0.2);
-                    return a + b * cos(6.28318 * (c * t + d));
-                }
+            vec3 color = palette(pattern + u_time * 0.05);
+            color += mouseGlow * vec3(0.8, 0.2, 0.4);
 
-                void main() {
-                    vec2 uv = gl_FragCoord.xy / u_resolution;
-                    vec2 mouse = u_mouse;
+            float vignette = 1.0 - smoothstep(0.3, 1.2, length(uv - 0.5) * 1.4);
+            color *= vignette * 1.1;
 
-                    float dist = length(uv - mouse);
-                    float wave1 = sin(uv.x * 4.0 + u_time * 0.4 + dist * 3.0) * 0.5 + 0.5;
-                    float wave2 = sin(uv.y * 3.0 - u_time * 0.3 + dist * 2.0) * 0.5 + 0.5;
-                    float wave3 = sin((uv.x + uv.y) * 2.5 + u_time * 0.2) * 0.5 + 0.5;
+            gl_FragColor = vec4(color, 1.0);
+        }
+    `;
 
-                    float pattern = wave1 * 0.4 + wave2 * 0.35 + wave3 * 0.25;
+    function createShader(type, src) {
+        const s = gl.createShader(type);
+        gl.shaderSource(s, src);
+        gl.compileShader(s);
+        if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+            console.warn('Shader error:', gl.getShaderInfoLog(s));
+            gl.deleteShader(s);
+            return null;
+        }
+        return s;
+    }
 
-                    // Mouse influence
-                    float mouseGlow = smoothstep(0.4, 0.0, dist) * 0.3;
+    const vs = createShader(gl.VERTEX_SHADER,   vertSrc);
+    const fs = createShader(gl.FRAGMENT_SHADER, fragSrc);
 
-                    vec3 color = palette(pattern + u_time * 0.05);
-                    color += mouseGlow * vec3(0.8, 0.2, 0.4);
+    if (!vs || !fs) {
+        canvas.style.display = 'none';
+        document.getElementById('bgFallback').style.display = 'block';
+        return;
+    }
 
-                    // Vignette
-                    float vignette = 1.0 - smoothstep(0.3, 1.2, length(uv - 0.5) * 1.4);
-                    color *= vignette * 1.1;
+    const program = gl.createProgram();
+    gl.attachShader(program, vs);
+    gl.attachShader(program, fs);
+    gl.linkProgram(program);
 
-                    gl_FragColor = vec4(color, 1.0);
-                }
-            `;
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        console.warn('Program link error:', gl.getProgramInfoLog(program));
+        canvas.style.display = 'none';
+        document.getElementById('bgFallback').style.display = 'block';
+        return;
+    }
 
-            function createShader(type, src) {
-                const s = gl.createShader(type);
-                gl.shaderSource(s, src);
-                gl.compileShader(s);
-                if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-                    console.warn(gl.getShaderInfoLog(s));
-                    gl.deleteShader(s);
-                    return null;
-                }
-                return s;
-            }
+    gl.useProgram(program);
 
-            const vs = createShader(gl.VERTEX_SHADER, vertSrc);
-            const fs = createShader(gl.FRAGMENT_SHADER, fragSrc);
+    const verts = new Float32Array([-1,-1, 1,-1, -1,1, 1,1]);
+    const buf   = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
 
-            if (!vs || !fs) {
-                canvas.style.background = 'linear-gradient(135deg, #1a0a12, #2a0a1a)';
-                return;
-            }
+    const posLoc = gl.getAttribLocation(program, 'position');
+    gl.enableVertexAttribArray(posLoc);
+    gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
 
-            const program = gl.createProgram();
-            gl.attachShader(program, vs);
-            gl.attachShader(program, fs);
-            gl.linkProgram(program);
-            gl.useProgram(program);
+    const uTime  = gl.getUniformLocation(program, 'u_time');
+    const uRes   = gl.getUniformLocation(program, 'u_resolution');
+    const uMouse = gl.getUniformLocation(program, 'u_mouse');
 
-            // Full-screen quad
-            const verts = new Float32Array([-1,-1, 1,-1, -1,1, 1,1]);
-            const buf = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-            gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
+    // Mouse / touch для fluid
+    document.addEventListener('mousemove', e => {
+        mouseX = e.clientX / width;
+        mouseY = 1.0 - e.clientY / height;
+    });
 
-            const posLoc = gl.getAttribLocation(program, 'position');
-            gl.enableVertexAttribArray(posLoc);
-            gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+    document.addEventListener('touchmove', e => {
+        if (e.touches[0]) {
+            mouseX = e.touches[0].clientX / width;
+            mouseY = 1.0 - e.touches[0].clientY / height;
+        }
+    }, { passive: true });
 
-            const uTime = gl.getUniformLocation(program, 'u_time');
-            const uRes = gl.getUniformLocation(program, 'u_resolution');
-            const uMouse = gl.getUniformLocation(program, 'u_mouse');
+    // Ограничиваем FPS на мобильных для экономии батареи
+    let lastTime = 0;
+    const targetFPS = isTouchDevice ? 30 : 60;
+    const frameInterval = 1000 / targetFPS;
 
-            document.addEventListener('mousemove', e => {
-                mouseX = e.clientX / width;
-                mouseY = 1.0 - e.clientY / height;
-            });
+    function render(now) {
+        animFrameId = requestAnimationFrame(render);
+        const delta = now - lastTime;
+        if (delta < frameInterval) return;
+        lastTime = now - (delta % frameInterval);
 
-            document.addEventListener('touchmove', e => {
-                if (e.touches[0]) {
-                    mouseX = e.touches[0].clientX / width;
-                    mouseY = 1.0 - e.touches[0].clientY / height;
-                }
-            }, { passive: true });
+        time += 0.016;
+        gl.uniform1f(uTime,  time);
+        gl.uniform2f(uRes,   width, height);
+        gl.uniform2f(uMouse, mouseX, mouseY);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    }
+    requestAnimationFrame(render);
 
-            function render() {
-                time += 0.016;
-                gl.uniform1f(uTime, time);
-                gl.uniform2f(uRes, width, height);
-                gl.uniform2f(uMouse, mouseX, mouseY);
-                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-                requestAnimationFrame(render);
-            }
-            render();
-        })();
+    // Останавливаем рендер когда вкладка скрыта (экономия батареи)
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            cancelAnimationFrame(animFrameId);
+        } else {
+            requestAnimationFrame(render);
+        }
+    });
+})();
 
-        // =============================================
-        // CUSTOM CURSOR
-        // =============================================
-        (function initCursor() {
-            if (window.matchMedia('(hover: none)').matches) return;
+// =============================================
+// CUSTOM CURSOR (только десктоп с мышью)
+// =============================================
+(function initCursor() {
+    if (isTouchDevice) return;
 
-            const dot = document.getElementById('cursorDot');
-            const ring = document.getElementById('cursorRing');
-            const glow = document.getElementById('cursorGlow');
+    const dot  = document.getElementById('cursorDot');
+    const ring = document.getElementById('cursorRing');
+    const glow = document.getElementById('cursorGlow');
 
-            let mx = window.innerWidth / 2, my = window.innerHeight / 2;
-            let cx = mx, cy = my;
+    if (!dot || !ring) return;
 
-            document.addEventListener('mousemove', e => {
-                mx = e.clientX;
-                my = e.clientY;
-                dot.style.left = mx + 'px';
-                dot.style.top = my + 'px';
-                glow.style.left = mx + 'px';
-                glow.style.top = my + 'px';
-            });
+    let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+    let cx = mx, cy = my;
 
-            function animateCursor() {
-                cx += (mx - cx) * 0.15;
-                cy += (my - cy) * 0.15;
-                ring.style.left = cx + 'px';
-                ring.style.top = cy + 'px';
-                requestAnimationFrame(animateCursor);
-            }
-            animateCursor();
+    document.addEventListener('mousemove', e => {
+        mx = e.clientX;
+        my = e.clientY;
+        dot.style.left  = mx + 'px';
+        dot.style.top   = my + 'px';
+        glow.style.left = mx + 'px';
+        glow.style.top  = my + 'px';
+    });
 
-            // Hover effects
-            document.querySelectorAll('button, .glass, a, .carousel-dot').forEach(el => {
-                el.addEventListener('mouseenter', () => {
-                    ring.style.width = '60px';
-                    ring.style.height = '60px';
-                    ring.style.borderColor = 'rgba(255, 77, 133, 0.6)';
-                    ring.style.background = 'rgba(255, 77, 133, 0.05)';
-                    dot.style.width = '4px';
-                    dot.style.height = '4px';
-                });
-                el.addEventListener('mouseleave', () => {
-                    ring.style.width = '40px';
-                    ring.style.height = '40px';
-                    ring.style.borderColor = 'rgba(255, 255, 255, 0.5)';
-                    ring.style.background = 'transparent';
-                    dot.style.width = '8px';
-                    dot.style.height = '8px';
-                });
-            });
-        })();
+    function animateCursor() {
+        cx += (mx - cx) * 0.15;
+        cy += (my - cy) * 0.15;
+        ring.style.left = cx + 'px';
+        ring.style.top  = cy + 'px';
+        requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
 
-        // =============================================
-        // GLASS CARD MOUSE FOLLOW HIGHLIGHT
-        // =============================================
-        document.querySelectorAll('.glass').forEach(card => {
-            card.addEventListener('mousemove', e => {
-                const rect = card.getBoundingClientRect();
-                const x = ((e.clientX - rect.left) / rect.width) * 100;
-                const y = ((e.clientY - rect.top) / rect.height) * 100;
-                card.style.setProperty('--mouse-x', x + '%');
-                card.style.setProperty('--mouse-y', y + '%');
-            });
+    document.querySelectorAll('button, .glass, a, .carousel-dot').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+            ring.style.width  = '60px';
+            ring.style.height = '60px';
+            ring.style.borderColor = 'rgba(255, 77, 133, 0.6)';
+            ring.style.background  = 'rgba(255, 77, 133, 0.05)';
+            dot.style.width  = '4px';
+            dot.style.height = '4px';
+        });
+        el.addEventListener('mouseleave', () => {
+            ring.style.width  = '40px';
+            ring.style.height = '40px';
+            ring.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+            ring.style.background  = 'transparent';
+            dot.style.width  = '8px';
+            dot.style.height = '8px';
+        });
+    });
+})();
+
+// =============================================
+// GLASS CARD MOUSE HIGHLIGHT
+// =============================================
+if (!isTouchDevice) {
+    document.querySelectorAll('.glass').forEach(card => {
+        card.addEventListener('mousemove', e => {
+            const rect = card.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top) / rect.height) * 100;
+            card.style.setProperty('--mouse-x', x + '%');
+            card.style.setProperty('--mouse-y', y + '%');
         });
 
-        // =============================================
-        // GLASS HIGHLIGHT SWEEP ON HOVER
-        // =============================================
-        document.querySelectorAll('.glass').forEach(card => {
-            const highlight = card.querySelector('.glass-highlight');
-            if (!highlight) return;
+        const highlight = card.querySelector('.glass-highlight');
+        if (highlight) {
             card.addEventListener('mouseenter', () => {
-                gsap.fromTo(highlight, { left: '-100%' }, { left: '200%', duration: 0.8, ease: 'power2.out' });
-            });
-        });
-
-        // =============================================
-        // PRELOADER
-        // =============================================
-        (function initPreloader() {
-            const preloader = document.getElementById('preloader');
-            const heartPath = preloader.querySelector('.preloader-heart path');
-            const heartFill = preloader.querySelector('.preloader-heart-fill');
-            const heartGlow = document.getElementById('preloaderGlow');
-            const preloaderText = document.getElementById('preloaderText');
-
-            const tl = gsap.timeline({
-                onComplete: () => {
-                    // Create burst particles
-                    createPreloaderBurst();
-
-                    gsap.to(preloader, {
-                        opacity: 0,
-                        duration: 1.2,
-                        delay: 0.6,
-                        ease: 'power2.inOut',
-                        onComplete: () => {
-                            preloader.classList.add('done');
-                            preloader.style.display = 'none';
-                            animateHero();
-                        }
-                    });
-                }
-            });
-
-            tl.to(heartPath, {
-                strokeDashoffset: 0,
-                duration: 2,
-                ease: 'power2.inOut'
-            })
-            .to(preloaderText, { opacity: 1, duration: 0.5 }, 0.5)
-            .to(heartGlow, { opacity: 0.6, duration: 1.5, ease: 'power2.out' }, 0.5)
-            .to(heartFill, { opacity: 1, duration: 0.8, ease: 'power2.out' }, 1.5)
-            .to(heartGlow, { scale: 2, opacity: 0, duration: 0.8, ease: 'power2.out' }, 2.2);
-
-            function createPreloaderBurst() {
-                const container = document.getElementById('preloaderParticles');
-                const colors = ['#FF4D85', '#FFB6D5', '#E0C3FC', '#FAD0C4', '#FF6B9D'];
-                const cx = window.innerWidth / 2;
-                const cy = window.innerHeight / 2;
-
-                for (let i = 0; i < 40; i++) {
-                    const p = document.createElement('div');
-                    p.className = 'preloader-particle';
-                    const size = Math.random() * 8 + 3;
-                    p.style.width = size + 'px';
-                    p.style.height = size + 'px';
-                    p.style.background = colors[Math.floor(Math.random() * colors.length)];
-                    p.style.left = cx + 'px';
-                    p.style.top = cy + 'px';
-                    container.appendChild(p);
-
-                    const angle = (Math.PI * 2 * i) / 40 + (Math.random() - 0.5) * 0.5;
-                    const dist = 100 + Math.random() * 300;
-
-                    gsap.to(p, {
-                        x: Math.cos(angle) * dist,
-                        y: Math.sin(angle) * dist,
-                        opacity: 0,
-                        scale: 0,
-                        duration: 1 + Math.random() * 0.5,
-                        ease: 'power2.out',
-                        delay: Math.random() * 0.2
-                    });
-                }
-            }
-        })();
-
-        // =============================================
-        // HERO ANIMATIONS
-        // =============================================
-        function animateHero() {
-            const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-
-            tl.to('.hero-label span', {
-                y: 0, opacity: 1, duration: 0.8,
-                from: { y: 20, opacity: 0 }
-            })
-            .to('.hero-title .line-1 span', {
-                y: 0, duration: 1, ease: 'power4.out'
-            }, 0.3)
-            .to('.hero-title .line-2 span', {
-                y: 0, duration: 1.2, ease: 'power4.out'
-            }, 0.5)
-            .to('.hero-date span', {
-                y: 0, opacity: 1, duration: 0.8,
-                from: { y: 15, opacity: 0 }
-            }, 0.8)
-            .fromTo('.magnetic-btn', {
-                y: 30, opacity: 0, scale: 0.9
-            }, {
-                y: 0, opacity: 1, scale: 1, duration: 0.8
-            }, 1)
-            .to('#scrollIndicator', {
-                opacity: 0.5, duration: 0.6
-            }, 1.5);
-        }
-
-        // =============================================
-        // MAGNETIC BUTTON
-        // =============================================
-        (function initMagneticBtn() {
-            if (window.matchMedia('(hover: none)').matches) return;
-
-            const wrapper = document.getElementById('magneticWrapper');
-            const btn = document.getElementById('magneticBtn');
-            if (!wrapper || !btn) return;
-
-            const strength = 30;
-
-            wrapper.addEventListener('mousemove', e => {
-                const rect = wrapper.getBoundingClientRect();
-                const x = e.clientX - rect.left - rect.width / 2;
-                const y = e.clientY - rect.top - rect.height / 2;
-
-                gsap.to(btn, {
-                    x: x * 0.3,
-                    y: y * 0.3,
-                    duration: 0.4,
-                    ease: 'power2.out'
-                });
-            });
-
-            wrapper.addEventListener('mouseleave', () => {
-                gsap.to(btn, { x: 0, y: 0, duration: 0.6, ease: 'elastic.out(1, 0.5)' });
-            });
-        })();
-
-        // =============================================
-        // SMOOTH SCROLL FUNCTION
-        // =============================================
-        function scrollToSection(selector) {
-            const el = document.querySelector(selector);
-            if (el) {
-                el.scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-
-        // =============================================
-        // COMPLIMENTS SCROLL ANIMATIONS
-        // =============================================
-        gsap.from('.compliments-label', {
-            scrollTrigger: {
-                trigger: '#complimentsSection',
-                start: 'top 80%',
-            },
-            y: 30, opacity: 0, duration: 0.8
-        });
-
-        gsap.from('.compliments-title', {
-            scrollTrigger: {
-                trigger: '#complimentsSection',
-                start: 'top 75%',
-            },
-            y: 40, opacity: 0, duration: 1, delay: 0.2
-        });
-
-        gsap.from('.carousel-card', {
-            scrollTrigger: {
-                trigger: '.carousel',
-                start: 'top 85%',
-            },
-            y: 60, opacity: 0, scale: 0.95,
-            duration: 0.8,
-            stagger: 0.15,
-            ease: 'power3.out'
-        });
-
-        // Carousel dots
-        const carousel = document.getElementById('carousel');
-        const dots = document.querySelectorAll('.carousel-dot');
-        const cards = document.querySelectorAll('.carousel-card');
-
-        carousel.addEventListener('scroll', () => {
-            const scrollLeft = carousel.scrollLeft;
-            const cardWidth = cards[0].offsetWidth + 24;
-            const idx = Math.round(scrollLeft / cardWidth);
-            dots.forEach((d, i) => d.classList.toggle('active', i === idx));
-        });
-
-        dots.forEach(dot => {
-            dot.addEventListener('click', () => {
-                const idx = parseInt(dot.dataset.index);
-                const cardWidth = cards[0].offsetWidth + 24;
-                carousel.scrollTo({ left: idx * cardWidth, behavior: 'smooth' });
-            });
-        });
-
-        // =============================================
-        // MESSAGE SECTION — FOG WIPE EFFECT
-        // =============================================
-        (function initFogEffect() {
-            const messageCard = document.getElementById('messageCard');
-            const fogOverlay = document.getElementById('fogOverlay');
-            const fogHint = document.getElementById('fogHint');
-
-            if (!fogOverlay) return;
-
-            let fogCanvas, fogCtx;
-            let fogRevealed = 0;
-            let isDrawing = false;
-
-            function setupFogCanvas() {
-                fogCanvas = document.createElement('canvas');
-                const rect = messageCard.getBoundingClientRect();
-                fogCanvas.width = rect.width;
-                fogCanvas.height = rect.height;
-                fogCtx = fogCanvas.getContext('2d');
-
-                // Fill with opaque
-                fogCtx.fillStyle = '#1a0a12';
-                fogCtx.fillRect(0, 0, fogCanvas.width, fogCanvas.height);
-
-                // Apply as mask
-                updateFogMask();
-            }
-
-            function updateFogMask() {
-                const dataUrl = fogCanvas.toDataURL();
-                fogOverlay.style.webkitMaskImage = `url(${dataUrl})`;
-                fogOverlay.style.maskImage = `url(${dataUrl})`;
-            }
-
-            function wipe(x, y) {
-                if (!fogCtx) return;
-                const rect = messageCard.getBoundingClientRect();
-                const cx = x - rect.left;
-                const cy = y - rect.top;
-
-                fogCtx.globalCompositeOperation = 'destination-out';
-                const radius = 50;
-                const gradient = fogCtx.createRadialGradient(cx, cy, 0, cx, cy, radius);
-                gradient.addColorStop(0, 'rgba(0,0,0,1)');
-                gradient.addColorStop(0.7, 'rgba(0,0,0,0.8)');
-                gradient.addColorStop(1, 'rgba(0,0,0,0)');
-                fogCtx.fillStyle = gradient;
-                fogCtx.beginPath();
-                fogCtx.arc(cx, cy, radius, 0, Math.PI * 2);
-                fogCtx.fill();
-
-                updateFogMask();
-
-                // Track how much revealed
-                fogRevealed += 0.3;
-                if (fogRevealed > 15) {
-                    gsap.to(fogHint, { opacity: 0, duration: 0.5 });
-                }
-                if (fogRevealed > 60) {
-                    // Auto-clear remaining
-                    gsap.to(fogOverlay, { opacity: 0, duration: 1.5, ease: 'power2.out' });
-                }
-            }
-
-            // Observe when section is visible to initialize
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        setTimeout(setupFogCanvas, 300);
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.3 });
-
-            observer.observe(messageCard);
-
-            // Mouse events
-            messageCard.addEventListener('mousemove', e => {
-                wipe(e.clientX, e.clientY);
-            });
-
-            // Touch events
-            messageCard.addEventListener('touchstart', e => {
-                isDrawing = true;
-                if (e.touches[0]) wipe(e.touches[0].clientX, e.touches[0].clientY);
-            }, { passive: true });
-
-            messageCard.addEventListener('touchmove', e => {
-                if (isDrawing && e.touches[0]) {
-                    wipe(e.touches[0].clientX, e.touches[0].clientY);
-                }
-            }, { passive: true });
-
-            messageCard.addEventListener('touchend', () => { isDrawing = false; });
-
-            // GSAP reveal animation
-            gsap.from('.message-label', {
-                scrollTrigger: { trigger: '#messageSection', start: 'top 80%' },
-                y: 20, opacity: 0, duration: 0.8
-            });
-
-            gsap.from('.message-card', {
-                scrollTrigger: { trigger: '#messageSection', start: 'top 70%' },
-                y: 60, opacity: 0, scale: 0.95, duration: 1, ease: 'power3.out'
-            });
-        })();
-
-        // =============================================
-        // FINALE ANIMATIONS
-        // =============================================
-        gsap.from('.finale-emoji', {
-            scrollTrigger: { trigger: '#finaleSection', start: 'top 70%' },
-            y: 30, opacity: 0, scale: 0.5, duration: 0.8, ease: 'back.out(2)'
-        });
-
-        gsap.from('.finale-text', {
-            scrollTrigger: { trigger: '#finaleSection', start: 'top 65%' },
-            y: 40, opacity: 0, duration: 1, delay: 0.2
-        });
-
-        gsap.from('.finale-subtext', {
-            scrollTrigger: { trigger: '#finaleSection', start: 'top 60%' },
-            y: 20, opacity: 0, duration: 0.8, delay: 0.5
-        });
-
-        gsap.from('.finale-heart-btn', {
-            scrollTrigger: { trigger: '#finaleSection', start: 'top 55%' },
-            scale: 0, opacity: 0, duration: 0.8, delay: 0.7, ease: 'back.out(2)'
-        });
-
-        gsap.from('.finale-heart-hint', {
-            scrollTrigger: { trigger: '#finaleSection', start: 'top 55%' },
-            y: 10, opacity: 0, duration: 0.6, delay: 1
-        });
-
-        // =============================================
-        // CONFETTI ENGINE
-        // =============================================
-        const confCanvas = document.getElementById('confettiCanvas');
-        const confCtx = confCanvas.getContext('2d');
-        let confettiPieces = [];
-        let confAnimating = false;
-
-        function resizeConfetti() {
-            confCanvas.width = window.innerWidth;
-            confCanvas.height = window.innerHeight;
-        }
-        resizeConfetti();
-        window.addEventListener('resize', resizeConfetti);
-
-        class Confetti {
-            constructor() {
-                this.x = Math.random() * confCanvas.width;
-                this.y = -10 - Math.random() * 100;
-                this.w = Math.random() * 10 + 5;
-                this.h = Math.random() * 6 + 3;
-                this.vx = (Math.random() - 0.5) * 6;
-                this.vy = Math.random() * 4 + 3;
-                this.rot = Math.random() * 360;
-                this.rotSpeed = (Math.random() - 0.5) * 12;
-                this.opacity = 1;
-                this.color = ['#FF4D85', '#FFB6D5', '#E0C3FC', '#FAD0C4', '#FF6B9D', '#FFD700', '#FF69B4', '#DDA0DD'][
-                    Math.floor(Math.random() * 8)
-                ];
-                this.shape = Math.random() > 0.4 ? 'rect' : 'circle';
-            }
-
-            update() {
-                this.y += this.vy;
-                this.x += this.vx;
-                this.rot += this.rotSpeed;
-                this.vy += 0.04;
-                this.vx *= 0.99;
-                this.opacity -= 0.004;
-                return this.y < confCanvas.height + 30 && this.opacity > 0;
-            }
-
-            draw() {
-                confCtx.save();
-                confCtx.globalAlpha = Math.max(0, this.opacity);
-                confCtx.translate(this.x, this.y);
-                confCtx.rotate((this.rot * Math.PI) / 180);
-                confCtx.fillStyle = this.color;
-
-                if (this.shape === 'rect') {
-                    confCtx.fillRect(-this.w / 2, -this.h / 2, this.w, this.h);
-                } else {
-                    confCtx.beginPath();
-                    confCtx.arc(0, 0, this.w / 2, 0, Math.PI * 2);
-                    confCtx.fill();
-                }
-                confCtx.restore();
-            }
-        }
-
-        function launchConfetti() {
-            const count = window.innerWidth < 768 ? 80 : 150;
-            for (let i = 0; i < count; i++) {
-                setTimeout(() => confettiPieces.push(new Confetti()), Math.random() * 500);
-            }
-            if (!confAnimating) {
-                confAnimating = true;
-                renderConfetti();
-            }
-        }
-
-        function renderConfetti() {
-            confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
-            confettiPieces = confettiPieces.filter(p => {
-                const alive = p.update();
-                if (alive) p.draw();
-                return alive;
-            });
-            if (confettiPieces.length > 0) {
-                requestAnimationFrame(renderConfetti);
-            } else {
-                confAnimating = false;
-            }
-        }
-
-        // =============================================
-        // FINALE TRIGGER
-        // =============================================
-        let finaleTriggered = false;
-
-        function triggerFinale() {
-            launchConfetti();
-            if (!finaleTriggered) {
-                finaleTriggered = true;
-                setTimeout(() => {
-                    document.getElementById('finaleReveal').classList.add('show');
-                }, 400);
-            }
-
-            // Heart button pulse
-            gsap.fromTo('#finaleHeartBtn', { scale: 1 }, {
-                scale: 1.3, duration: 0.15, yoyo: true, repeat: 1, ease: 'power2.out'
+                gsap.fromTo(highlight,
+                    { left: '-100%' },
+                    { left: '200%', duration: 0.8, ease: 'power2.out' }
+                );
             });
         }
+    });
+}
 
-        // =============================================
-        // PARTICLE TRAIL (Desktop finale section)
-        // =============================================
-        (function initTrail() {
-            if (window.matchMedia('(hover: none)').matches) return;
+// =============================================
+// PRELOADER
+// =============================================
+(function initPreloader() {
+    const preloader    = document.getElementById('preloader');
+    const heartPath    = preloader.querySelector('.preloader-heart path');
+    const heartFill    = preloader.querySelector('.preloader-heart-fill');
+    const heartGlow    = document.getElementById('preloaderGlow');
+    const preloaderTxt = document.getElementById('preloaderText');
 
-            const finale = document.getElementById('finaleSection');
-            let trail = [];
-            const maxTrail = 20;
-
-            finale.addEventListener('mousemove', e => {
-                const dot = document.createElement('div');
-                dot.style.cssText = `
-                    position: fixed;
-                    width: ${Math.random() * 6 + 3}px;
-                    height: ${Math.random() * 6 + 3}px;
-                    background: ${['#FF4D85', '#FFB6D5', '#E0C3FC'][Math.floor(Math.random() * 3)]};
-                    border-radius: 50%;
-                    pointer-events: none;
-                    z-index: 99998;
-                    left: ${e.clientX}px;
-                    top: ${e.clientY}px;
-                    transform: translate(-50%, -50%);
-                `;
-                document.body.appendChild(dot);
-
-                gsap.to(dot, {
-                    opacity: 0,
-                    scale: 0,
-                    y: Math.random() * 30 - 15,
-                    x: Math.random() * 30 - 15,
-                    duration: 0.8 + Math.random() * 0.5,
-                    ease: 'power2.out',
-                    onComplete: () => dot.remove()
-                });
-            });
-        })();
-
-        // =============================================
-        // SMOOTH REVEAL FOR ALL SECTIONS
-        // =============================================
-        document.querySelectorAll('.section').forEach((section, i) => {
-            if (i === 0) return; // Skip hero
-
-            ScrollTrigger.create({
-                trigger: section,
-                start: 'top 90%',
-                onEnter: () => {
-                    gsap.to(section, { opacity: 1, duration: 0.5 });
+    const tl = gsap.timeline({
+        onComplete() {
+            createBurst();
+            gsap.to(preloader, {
+                opacity: 0,
+                duration: 1,
+                delay: 0.5,
+                ease: 'power2.inOut',
+                onComplete() {
+                    preloader.style.display = 'none';
+                    animateHero();
                 }
             });
-        });
-    </script>
+        }
+    });
 
+    tl
+      .to(heartPath,    { strokeDashoffset: 0, duration: 2, ease: 'power2.inOut' })
+      .to(preloaderTxt, { opacity: 1, duration: 0.5 }, 0.5)
+      .to(heartGlow,    { opacity: 0.6, duration: 1.5, ease: 'power2.out' }, 0.5)
+      .to(heartFill,    { opacity: 1, duration: 0.8, ease: 'power2.out' }, 1.5)
+      .to(heartGlow,    { scale: 2, opacity: 0, duration: 0.8, ease: 'power2.out' }, 2.2);
+
+    function createBurst() {
+        const container = document.getElementById('preloaderParticles');
+        const colors    = ['#FF4D85','#FFB6D5','#E0C3FC','#FAD0C4','#FF6B9D'];
+        const cx = window.innerWidth / 2;
+        const cy = window.innerHeight / 2;
+
+        for (let i = 0; i < 30; i++) {
+            const p    = document.createElement('div');
+            p.className = 'preloader-particle';
+            const size = Math.random() * 8 + 3;
+            p.style.cssText = `
+                width:${size}px; height:${size}px;
+                background:${colors[Math.floor(Math.random()*colors.length)]};
+                left:${cx}px; top:${cy}px;
+            `;
+            container.appendChild(p);
+
+            const angle = (Math.PI * 2 * i) / 30 + (Math.random() - 0.5) * 0.5;
+            const dist  = 80 + Math.random() * 220;
+
+            gsap.to(p, {
+                x: Math.cos(angle) * dist,
+                y: Math.sin(angle) * dist,
+                opacity: 0,
+                scale: 0,
+                duration: 0.8 + Math.random() * 0.4,
+                ease: 'power2.out',
+                delay: Math.random() * 0.15
+            });
+        }
+    }
+})();
+
+// =============================================
+// HERO ANIMATIONS
+// =============================================
+function animateHero() {
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+    tl
+      .fromTo('.hero-label',
+          { y: 20, opacity: 0 },
+          { y: 0,  opacity: 1, duration: 0.8 }
+      )
+      .to('.hero-title .line-1 span', { y: 0, duration: 1,   ease: 'power4.out' }, 0.3)
+      .to('.hero-title .line-2 span', { y: 0, duration: 1.2, ease: 'power4.out' }, 0.5)
+      .fromTo('.hero-date',
+          { y: 15, opacity: 0 },
+          { y: 0,  opacity: 1, duration: 0.8 }, 0.8
+      )
+      .fromTo('.magnetic-btn',
+          { y: 30, opacity: 0, scale: 0.9 },
+          { y: 0,  opacity: 1, scale: 1, duration: 0.8 }, 1
+      )
+      .to('#scrollIndicator', { opacity: 0.5, duration: 0.6 }, 1.5);
+}
+
+// =============================================
+// MAGNETIC BUTTON + SCROLL
+// =============================================
+document.getElementById('magneticBtn').addEventListener('click', () => {
+    const target = document.getElementById('complimentsSection');
+    if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+});
+
+// Десктоп: магнитный эффект
+if (!isTouchDevice) {
+    const wrapper = document.getElementById('magneticWrapper');
+    const btn     = document.getElementById('magneticBtn');
+
+    wrapper.addEventListener('mousemove', e => {
+        const rect = wrapper.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width  / 2;
+        const y = e.clientY - rect.top  - rect.height / 2;
+        gsap.to(btn, { x: x * 0.3, y: y * 0.3, duration: 0.4, ease: 'power2.out' });
+    });
+
+    wrapper.addEventListener('mouseleave', () => {
+        gsap.to(btn, { x: 0, y: 0, duration: 0.6, ease: 'elastic.out(1, 0.5)' });
+    });
+}
+
+// =============================================
+// CAROUSEL
+// =============================================
+const carousel = document.getElementById('carousel');
+const dots     = document.querySelectorAll('.carousel-dot');
+const cards    = document.querySelectorAll('.carousel-card');
+
+// Обновление точек при скролле
+carousel.addEventListener('scroll', () => {
+    if (!cards.length) return;
+    const cardW = cards[0].offsetWidth + 20; // gap = 20px
+    const idx   = Math.round(carousel.scrollLeft / cardW);
+    dots.forEach((d, i) => {
+        d.classList.toggle('active', i === Math.min(idx, dots.length - 1));
+    });
+}, { passive: true });
+
+// Клик по точкам
+dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+        const idx   = parseInt(dot.dataset.index);
+        const cardW = cards[0].offsetWidth + 20;
+        carousel.scrollTo({ left: idx * cardW, behavior: 'smooth' });
+    });
+});
+
+// Анимации при появлении
+gsap.from('.compliments-label', {
+    scrollTrigger: { trigger: '#complimentsSection', start: 'top 80%' },
+    y: 30, opacity: 0, duration: 0.8
+});
+
+gsap.from('.compliments-title', {
+    scrollTrigger: { trigger: '#complimentsSection', start: 'top 75%' },
+    y: 40, opacity: 0, duration: 1, delay: 0.2
+});
+
+gsap.from('.carousel-card', {
+    scrollTrigger: { trigger: '.carousel', start: 'top 85%' },
+    y: 60, opacity: 0, scale: 0.95,
+    duration: 0.8, stagger: 0.12, ease: 'power3.out'
+});
+
+// =============================================
+// MESSAGE / FOG EFFECT
+// Переработан: вместо canvas-mask используем
+// CSS clip-path / opacity + touch-reveal
+// =============================================
+(function initFogEffect() {
+    const messageCard      = document.getElementById('messageCard');
+    const fogOverlay       = document.getElementById('fogOverlay');
+    const fogHint          = document.getElementById('fogHint');
+    const fogTouchIndicator = document.getElementById('fogTouchIndicator');
+
+    if (!fogOverlay || !messageCard) return;
+
+    // Состояние раскрытия
+    let revealed = false;
+    let touchCount = 0;
+    const REVEAL_THRESHOLD = 8; // сколько касаний чтобы открыть
+
+    function handleRevealPoint(x, y) {
+        if (revealed) return;
+
+        touchCount++;
+
+        // Показываем индикатор касания
+        const rect = messageCard.getBoundingClientRect();
+        fogTouchIndicator.style.left = (x - rect.left) + 'px';
+        fogTouchIndicator.style.top  = (y - rect.top)  + 'px';
+        fogTouchIndicator.classList.add('active');
+
+        setTimeout(() => fogTouchIndicator.classList.remove('active'), 300);
+
+        // Прогресс раскрытия
+        const progress = Math.min(touchCount / REVEAL_THRESHOLD, 1);
+        fogOverlay.style.opacity = String(1 - progress * 0.85);
+
+        if (touchCount >= 3) {
+            gsap.to(fogHint, { opacity: 0, duration: 0.4 });
+        }
+
+        if (touchCount >= REVEAL_THRESHOLD) {
+            fullyReveal();
+        }
+    }
+
+    function fullyReveal() {
+        if (revealed) return;
+        revealed = true;
+        gsap.to(fogOverlay, { opacity: 0, duration: 1.5, ease: 'power2.out' });
+        gsap.to(fogTouchIndicator, { opacity: 0, duration: 0.3 });
+    }
+
+    // Мышь — постоянное движение
+    if (!isTouchDevice) {
+        messageCard.addEventListener('mousemove', e => {
+            handleRevealPoint(e.clientX, e.clientY);
+        });
+    }
+
+    // Touch — каждое касание/движение
+    messageCard.addEventListener('touchstart', e => {
+        if (e.touches[0]) handleRevealPoint(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+
+    messageCard.addEventListener('touchmove', e => {
+        if (e.touches[0]) handleRevealPoint(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+
+    // Анимации секции
+    gsap.from('.message-label', {
+        scrollTrigger: { trigger: '#messageSection', start: 'top 80%' },
+        y: 20, opacity: 0, duration: 0.8
+    });
+
+    gsap.from('#messageCard', {
+        scrollTrigger: { trigger: '#messageSection', start: 'top 70%' },
+        y: 60, opacity: 0, scale: 0.95, duration: 1, ease: 'power3.out'
+    });
+})();
+
+// =============================================
+// FINALE
+// =============================================
+gsap.from('.finale-emoji', {
+    scrollTrigger: { trigger: '#finaleSection', start: 'top 70%' },
+    y: 30, opacity: 0, scale: 0.5, duration: 0.8, ease: 'back.out(2)'
+});
+
+gsap.from('.finale-text', {
+    scrollTrigger: { trigger: '#finaleSection', start: 'top 65%' },
+    y: 40, opacity: 0, duration: 1, delay: 0.2
+});
+
+gsap.from('.finale-subtext', {
+    scrollTrigger: { trigger: '#finaleSection', start: 'top 60%' },
+    y: 20, opacity: 0, duration: 0.8, delay: 0.5
+});
+
+gsap.from('.finale-heart-btn', {
+    scrollTrigger: { trigger: '#finaleSection', start: 'top 55%' },
+    scale: 0, opacity: 0, duration: 0.8, delay: 0.7, ease: 'back.out(2)'
+});
+
+gsap.from('.finale-heart-hint', {
+    scrollTrigger: { trigger: '#finaleSection', start: 'top 55%' },
+    y: 10, opacity: 0, duration: 0.6, delay: 1
+});
+
+// =============================================
+// CONFETTI ENGINE
+// =============================================
+const confCanvas = document.getElementById('confettiCanvas');
+const confCtx    = confCanvas.getContext('2d');
+let confettiPieces = [];
+let confAnimating  = false;
+
+function resizeConf() {
+    confCanvas.width  = window.innerWidth;
+    confCanvas.height = window.innerHeight;
+}
+resizeConf();
+window.addEventListener('resize', resizeConf);
+
+class ConfettiPiece {
+    constructor() {
+        this.reset();
+    }
+    reset() {
+        this.x        = Math.random() * confCanvas.width;
+        this.y        = -10 - Math.random() * 100;
+        this.w        = Math.random() * 10 + 5;
+        this.h        = Math.random() * 6 + 3;
+        this.vx       = (Math.random() - 0.5) * 5;
+        this.vy       = Math.random() * 3 + 2;
+        this.rot      = Math.random() * 360;
+        this.rotSpeed = (Math.random() - 0.5) * 10;
+        this.opacity  = 1;
+        this.color    = [
+            '#FF4D85','#FFB6D5','#E0C3FC',
+            '#FAD0C4','#FF6B9D','#FFD700','#FF69B4','#DDA0DD'
+        ][Math.floor(Math.random() * 8)];
+        this.shape = Math.random() > 0.4 ? 'rect' : 'circle';
+    }
+    update() {
+        this.y   += this.vy;
+        this.x   += this.vx;
+        this.rot += this.rotSpeed;
+        this.vy  += 0.03;
+        this.vx  *= 0.99;
+        this.opacity -= 0.003;
+        return this.y < confCanvas.height + 30 && this.opacity > 0;
+    }
+    draw() {
+        confCtx.save();
+        confCtx.globalAlpha = Math.max(0, this.opacity);
+        confCtx.translate(this.x, this.y);
+        confCtx.rotate((this.rot * Math.PI) / 180);
+        confCtx.fillStyle = this.color;
+        if (this.shape === 'rect') {
+            confCtx.fillRect(-this.w / 2, -this.h / 2, this.w, this.h);
+        } else {
+            confCtx.beginPath();
+            confCtx.arc(0, 0, this.w / 2, 0, Math.PI * 2);
+            confCtx.fill();
+        }
+        confCtx.restore();
+    }
+}
+
+function launchConfetti() {
+    const count = isTouchDevice ? 60 : 120;
+    for (let i = 0; i < count; i++) {
+        setTimeout(() => confettiPieces.push(new ConfettiPiece()), Math.random() * 600);
+    }
+    if (!confAnimating) {
+        confAnimating = true;
+        renderConfetti();
+    }
+}
+
+function renderConfetti() {
+    confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
+    confettiPieces = confettiPieces.filter(p => {
+        const alive = p.update();
+        if (alive) p.draw();
+        return alive;
+    });
+    if (confettiPieces.length > 0) {
+        requestAnimationFrame(renderConfetti);
+    } else {
+        confAnimating = false;
+    }
+}
+
+// =============================================
+// FINALE TRIGGER
+// =============================================
+let finaleTriggered = false;
+
+function triggerFinale() {
+    launchConfetti();
+
+    if (!finaleTriggered) {
+        finaleTriggered = true;
+
+        // Задержка для плавности
+        setTimeout(() => {
+            document.getElementById('finaleReveal').classList.add('show');
+        }, 400);
+    }
+
+    // Анимация кнопки
+    gsap.fromTo('#finaleHeartBtn',
+        { scale: 1 },
+        { scale: 1.25, duration: 0.15, yoyo: true, repeat: 1, ease: 'power2.out' }
+    );
+}
+
+// Вешаем через addEventListener — надёжнее для iOS
+document.getElementById('finaleHeartBtn').addEventListener('click', triggerFinale);
+
+// Убираем onclick из HTML (уже удалён в разметке выше)
+
+// =============================================
+// PARTICLE TRAIL (только десктоп)
+// =============================================
+if (!isTouchDevice) {
+    const finale = document.getElementById('finaleSection');
+
+    finale.addEventListener('mousemove', e => {
+        const dot = document.createElement('div');
+        const size = Math.random() * 6 + 3;
+        const color = ['#FF4D85','#FFB6D5','#E0C3FC'][Math.floor(Math.random() * 3)];
+
+        dot.style.cssText = `
+            position: fixed;
+            width: ${size}px;
+            height: ${size}px;
+            background: ${color};
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99998;
+            left: ${e.clientX}px;
+            top: ${e.clientY}px;
+            transform: translate(-50%, -50%);
+        `;
+        document.body.appendChild(dot);
+
+        gsap.to(dot, {
+            opacity: 0,
+            scale: 0,
+            y: Math.random() * 30 - 15,
+            x: Math.random() * 30 - 15,
+            duration: 0.6 + Math.random() * 0.4,
+            ease: 'power2.out',
+            onComplete: () => dot.parentNode && dot.remove()
+        });
+    });
+}
+
+// =============================================
+// ОБНОВЛЕНИЕ ScrollTrigger после загрузки шрифтов
+// =============================================
+if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => {
+        ScrollTrigger.refresh();
+    });
+}
+
+// iOS: обновляем ScrollTrigger после resize (адресная строка браузера)
+window.addEventListener('resize', () => {
+    clearTimeout(window._stRefreshTimer);
+    window._stRefreshTimer = setTimeout(() => ScrollTrigger.refresh(), 200);
+});
+</script>
 </body>
 </html>
